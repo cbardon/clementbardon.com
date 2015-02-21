@@ -1,0 +1,488 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Security.Principal;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace LilouWeb
+{
+    public partial class NouvelleApp : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            AccepterNou.Visible = false;
+            AccepterMod.Visible = false;
+            string tempusername = WindowsIdentity.GetCurrent().Name;
+            int i = tempusername.IndexOf(@"\");
+            string username = tempusername.Substring(i + 1, tempusername.Length - i - 1);
+            string lsUser = username;
+            this.lblSes.Text = Session["UsrIdf"].ToString();
+            lblMod.Visible = false;
+
+        }
+        protected void InsertButton_Click(object sender, EventArgs e)
+        {
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtSou.Text = "la connexion à l'environnement a échoué !";
+                lnCon.Close();
+                return;
+            }
+
+            if (txtLan.Text == "")
+            {
+                lsSql = "INSERT INTO APPLICATIONS (TXT_LBL,TXT_SOU,TXT_DES)";
+                lsSql += "VALUES (" + "'" + txtApp.Text + "'" + "," + "'" + txtSou.Text + "'" + "," + "'" + txtDes.Text + "'" + ")";
+                lcCmd = new SqlCommand(lsSql, lnCon);
+                lnRdr = lcCmd.ExecuteReader();
+                lnRdr.Read();
+            }
+            else
+                if (txtSou.Text == "" && txtDes.Text == "")
+                {
+                    lsSql = "INSERT INTO APPLICATIONS (TXT_LBL,TXT_LAN)";
+                    lsSql += "VALUES (" + "'" + txtApp.Text + "'" + "," + "'" + txtLan.Text + "'" + ")";
+                    lcCmd = new SqlCommand(lsSql, lnCon);
+                    lnRdr = lcCmd.ExecuteReader();
+                    lnRdr.Read();
+                }
+        }
+
+        protected void DropDownList1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtSou.Visible = false;
+            SqlConnection lnCon1 = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql, lsSql1, lsSql2;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon1.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtSou.Text = "la connexion à l'environnement a échoué !";
+                lnCon1.Close();
+                return;
+            }
+            //Recuperation de la source 
+            lsSql = "SELECT APPLICATIONS.TXT_SOU";
+            lsSql += " FROM APPLICATIONS";
+            lsSql += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql, lnCon1);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_sou.Text = lnRdr["TXT_SOU"].ToString();
+            lnRdr.Close();
+
+            //Recuperation de la destination 
+            lsSql1 = "SELECT APPLICATIONS.TXT_DES";
+            lsSql1 += " FROM APPLICATIONS";
+            lsSql1 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql1, lnCon1);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_des.Text = lnRdr["TXT_DES"].ToString();
+            lnRdr.Close();
+
+            //Recuperation du lanceur
+            lsSql2 = "SELECT APPLICATIONS.TXT_LAN";
+            lsSql2 += " FROM APPLICATIONS";
+            lsSql2 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql2, lnCon1);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_lan.Text = lnRdr["TXT_LAN"].ToString();
+            lnRdr.Close();
+
+            //Soit la destination ou le lanceur
+            /*if (des == "")
+                des_lan = lan;
+            else
+                des_lan = des;
+            */
+            if (cboApp.SelectedItem.ToString() != "Choisir une application")
+            {
+
+            }
+
+        }
+
+        protected void cboApp_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // txt_sou.Visible = false;
+            string source;
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql, lsSql1, lsSql2;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txt_sou.Text = "la connexion à l'environnement a échoué !";
+                lnCon.Close();
+                return;
+            }
+            //Recuperation de la source 
+            lsSql = "SELECT APPLICATIONS.TXT_SOU";
+            lsSql += " FROM APPLICATIONS";
+            lsSql += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_sou.Text = lnRdr["TXT_SOU"].ToString();
+            lnRdr.Close();
+
+            //Recuperation de la destination 
+            lsSql1 = "SELECT APPLICATIONS.TXT_DES";
+            lsSql1 += " FROM APPLICATIONS";
+            lsSql1 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql1, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_des.Text = lnRdr["TXT_DES"].ToString();
+            lnRdr.Close();
+
+            //Recuperation du lanceur
+            lsSql2 = "SELECT APPLICATIONS.TXT_LAN";
+            lsSql2 += " FROM APPLICATIONS";
+            lsSql2 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql2, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txt_lan.Text = lnRdr["TXT_LAN"].ToString();
+            lnRdr.Close();
+
+            //Recuperation id
+            lsSql1 = "SELECT APPLICATIONS.IDF_APP";
+            lsSql1 += " FROM APPLICATIONS";
+            lsSql1 += " WHERE APPLICATIONS.TXT_LBL = " + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql1, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            string id = lnRdr["IDF_APP"].ToString();
+            lnRdr.Close();
+
+         /*   //Recuperation extension specifique
+            lsSql = "SELECT distinct RECHERCHE.TXT_LBL";
+            lsSql += " FROM RECHERCHE, APPLICATIONS";
+            lsSql += " WHERE APPLICATIONS.IDF_APP = RECHERCHE.IDF_APP";
+            lsSql += " AND RECHERCHE.IDF_APP = " + id;
+            lcCmd = new SqlCommand(lsSql, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            txtExtension.Text = lnRdr["TXT_LBL"].ToString();
+            lnRdr.Close();*/
+        }
+
+        // Reconnaitre la version de l'OS
+        public static string GetOSVersion()
+        {
+            int OsVersion = Environment.OSVersion.Version.Major;
+            switch (OsVersion)
+            {
+                case 5:
+                    return "Windows XP";
+                case 6:
+                    switch (Environment.OSVersion.Version.Minor)
+                    {
+                        case 0:
+                            return "Windows Vista";
+                        case 1:
+                            return "Windows 7";
+                        default:
+                            return "Windows Vista & above";
+                    }
+                default:
+                    return "Unknown";
+            }
+        }
+
+
+
+        protected void imgMod_Click(object sender, ImageClickEventArgs e)
+        {
+
+        }
+
+        protected void AccepterMod_Click(object sender, ImageClickEventArgs e)
+        {
+        }
+        protected void ImageButton1_Click(object sender, EventArgs e)
+        {
+        }
+
+        protected void imgMod_Click(object sender, EventArgs e)
+        {
+        }
+
+        protected void imgDec_Click(object sender, EventArgs e)
+        {
+        }
+
+        protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+        {
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtSou.Text = "la connexion à l'environnement a échoué !";
+                lnCon.Close();
+                return;
+            }
+
+            lsSql = "SELECT COUNT(TXT_LBL)";
+            lsSql += " FROM APPLICATIONS";
+            lsSql += " WHERE TXT_LBL =" + "'" + txtApp.Text + "'";
+            lcCmd = new SqlCommand(lsSql, lnCon);
+            //  lnRdr = lcCmd.ExecuteReader();
+            // lnRdr.Read();
+            int numb = (int)lcCmd.ExecuteScalar();
+            if (numb == 0)
+            {
+                if (txtSou.Text == "" && txtDes.Text == "" && txtLan.Text == "" && txtApp.Text == "")
+                {
+                    lblErr.Text = "Veuillez remplir les champs";
+                }
+                else
+                    if (txtSou.Text != "" && txtDes.Text != "" && txtApp.Text != "" || txtApp.Text != "" && txtLan.Text != "")
+                    {
+                        if (txtLan.Text == "")
+                        {
+                            //Insertion du libellé et de la source et de la destination
+                            lsSql = "INSERT INTO APPLICATIONS (TXT_LBL,TXT_SOU,TXT_DES)";
+                            lsSql += "VALUES (" + "'" + txtApp.Text + "'" + "," + "'" + txtSou.Text + "'" + "," + "'" + txtDes.Text + "'" + ")";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                            AccepterNou.Visible = true;
+                            lnRdr.Close();
+
+                            //Recuperation idf application en fonction du libellé
+                            lsSql = "SELECT  APPLICATIONS.IDF_APP";
+                            lsSql += " FROM APPLICATIONS";
+                            lsSql += " WHERE TXT_LBL = '" + txtApp.Text + "'";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                            string app = lnRdr["IDF_APP"].ToString();
+                            lnRdr.Close();
+
+                            //Insertion de l'idf de l'identifiant et de l'application
+                            lsSql = "INSERT INTO UTILISATEURS_APPLICATIONS (IDF_USR,IDF_APP)";
+                            lsSql += "VALUES (" + "'" + Session["UsrIdf"] + "'" + "," + "'" + app + "'" + ")";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                            lnRdr.Close();
+
+
+
+                        }
+                        else
+                            if (txtSou.Text == "" && txtDes.Text == "")
+                            {
+                                //Insertion du libellé et du lanceur 
+                                lsSql = "INSERT INTO APPLICATIONS (TXT_LBL,TXT_LAN)";
+                                lsSql += "VALUES (" + "'" + txtApp.Text + "'" + "," + "'" + txtLan.Text + "'" + ")";
+                                lcCmd = new SqlCommand(lsSql, lnCon);
+                                lnRdr = lcCmd.ExecuteReader();
+                                lnRdr.Read();
+                                AccepterNou.Visible = true;
+                                lnRdr.Close();
+
+                                //Recuperation IDF application en fonction du libellé
+                                lsSql = "SELECT  APPLICATIONS.IDF_APP";
+                                lsSql += " FROM APPLICATIONS";
+                                lsSql += " WHERE TXT_LBL = '" + txtApp.Text + "'";
+                                lcCmd = new SqlCommand(lsSql, lnCon);
+                                lnRdr = lcCmd.ExecuteReader();
+                                lnRdr.Read();
+                                string app = lnRdr["IDF_APP"].ToString();
+                                lnRdr.Close();
+
+                                //Insertion de l'idf de l'identifiant et de l'application
+                                lsSql = "INSERT INTO UTILISATEURS_APPLICATIONS (IDF_USR,IDF_APP)";
+                                lsSql += "VALUES (" + "'" + Session["UsrIdf"] + "'" + "," + "'" + app + "'" + ")";
+                                lcCmd = new SqlCommand(lsSql, lnCon);
+                                lnRdr = lcCmd.ExecuteReader();
+                                lnRdr.Read();
+                                lnRdr.Close();
+
+
+                            }
+                        if (txtExt.Text != "")
+                        {
+                            //Recuperation IDF application en fonction du libellé
+                            lsSql = "SELECT  APPLICATIONS.IDF_APP";
+                            lsSql += " FROM APPLICATIONS";
+                            lsSql += " WHERE TXT_LBL = '" + txtApp.Text + "'";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                            string app = lnRdr["IDF_APP"].ToString();
+                            lnRdr.Close();
+                            lsSql = "INSERT INTO RECHERCHE(TXT_LBL,IDF_APP)";
+                            lsSql += "VALUES (" + "'" + txtExt.Text + "'" + "," + "'" + app + "'" + ")";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                        }
+                    }
+                    else
+                        lblErr.Text = "Veuillez remplir les champs necessaires";
+            }
+            else
+                lblErr.Text = "Ce nom est déjà utiliser dans une application";
+        }
+
+        protected void btnCre_Click(object sender, EventArgs e)
+        {
+            ChangementAppli.Visible = false;
+            NouvelleAppli.Visible = true;
+        }
+
+        protected void btnModifier_Click(object sender, EventArgs e)
+        {
+            ChangementAppli.Visible = true;
+            NouvelleAppli.Visible = false;
+        }
+
+        protected void txtExt_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void imgDec_Click(object sender, ImageClickEventArgs e)
+        {
+
+
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtSou.Text = "la connexion à l'environnement a échoué !";
+                lnCon.Close();
+                return;
+            }
+            else
+
+                if (txt_lan.Text == "" && txt_des.Text == "" && txt_sou.Text == "")
+                {
+                    lblErr2.Text = "Erreur veuillez verifier vos données";
+                }
+                else
+
+                    if (txt_lan.Text == "")
+                    {
+                        lsSql = "UPDATE APPLICATIONS";
+                        lsSql += " SET TXT_SOU =" + "'" + txt_sou.Text + "'" + "," + "TXT_DES =" + "'" + txt_des.Text + "'";
+                        lsSql += " WHERE TXT_LBL=" + "'" + cboApp.SelectedItem.ToString() + "'";
+                        lcCmd = new SqlCommand(lsSql, lnCon);
+                        lnRdr = lcCmd.ExecuteReader();
+                        lnRdr.Read();
+                        AccepterMod.Visible = true;
+                    }
+                    else
+                        if (txt_des.Text == "" && txt_sou.Text == "")
+                        {
+                            lsSql = "UPDATE APPLICATIONS";
+                            lsSql += " SET TXT_LAN =" + "'" + txt_lan.Text + "'";
+                            lsSql += " WHERE TXT_LBL=" + "'" + cboApp.SelectedItem.ToString() + "'";
+                            lcCmd = new SqlCommand(lsSql, lnCon);
+                            lnRdr = lcCmd.ExecuteReader();
+                            lnRdr.Read();
+                            AccepterMod.Visible = true;
+                        }
+
+        }
+
+
+
+
+    }
+}
+
+
+

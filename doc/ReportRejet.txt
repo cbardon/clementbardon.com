@@ -1,0 +1,288 @@
+using Microsoft.Reporting.WebForms;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.IO;
+
+namespace Arrete
+{
+    public partial class VisonneuseRejet : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+
+                ReportViewer1.ProcessingMode = ProcessingMode.Local;
+                ReportViewer1.LocalReport.ReportPath = Server.MapPath("~/Rejet.rdlc");
+                ReportViewer1.Visible = true;
+                lblRejet.Visible = false;
+                ListeRejet.Visible = false;
+                btnRechercherRej.Visible = false;
+            ReportViewer1.Visible = false;
+            BntCacher.Visible = false;
+            btnPdf.Visible = false;
+            btnAfficher.Visible = false;
+            btnApprouver.Visible = false;
+            listeChange.Visible = false;
+            lblUser.Text += Environment.UserName.ToUpper();
+            }
+        }
+        // DateSet1
+        private DataSet1 GetData(string query)
+        {
+            string conString = ConfigurationManager.ConnectionStrings["Ase_StageConnectionString"].ConnectionString;
+            SqlCommand cmd = new SqlCommand(query);
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                using (SqlDataAdapter sda = new SqlDataAdapter())
+                {
+                    cmd.Connection = con;
+                    sda.SelectCommand = cmd;
+                    using (DataSet1 dsDataSet = new DataSet1())
+                    {
+                        sda.Fill(dsDataSet, "DataTable1");
+                        return dsDataSet;
+                    }
+                }
+            }
+        }
+
+        protected void btnRechercherRej_Click(object sender, EventArgs e)
+        {
+
+            string requeteFoyer = "SELECT PROC_AIDEFI_PER.IDF_FOY " +
+                           "FROM PROC_AIDEFI, PROC_AIDEFI_PER  " +
+                           "WHERE PROC_AIDEFI.IDF_AID = PROC_AIDEFI_PER.IDF_AID  " +
+                           "AND PROC_AIDEFI.IDF_AID =" + ListeRejet.SelectedValue;
+            DataSet1 dsDataSetfoyer = GetData(requeteFoyer);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            ReportDataSource datasourceFoyer = new ReportDataSource("DataSet1", dsDataSetfoyer.Tables[1]);
+            string Foyer = dsDataSetfoyer.Tables[1].Rows[0][0].ToString().Trim();
+
+            ReportViewer1.Visible = true;
+            string lsSql = "SELECT TXT_EDI1 " +
+                                   "FROM PROC_AIDEFI " +
+                                   "WHERE IDF_AID = " + ListeRejet.SelectedValue;
+            DataSet1 dsDataSet = GetData(lsSql);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            ReportDataSource datasource = new ReportDataSource("DataSet1", dsDataSet.Tables[1]);
+            string decision = dsDataSet.Tables[1].Rows[0][0].ToString().Trim();
+
+            string RequeteCiv = "SELECT top 1 PERSONNE.TXT_CIV , PERSONNE.TXT_NOM, PERSONNE.TXT_PRE FROM PERSONNE "+
+                "WHERE  PERSONNE.IDF_FOY =" + Foyer + 
+            " AND TXT_CIV != 'enf'";
+
+            DataSet1 dsDataSet1 = GetData(RequeteCiv);
+            ReportDataSource datasource1 = new ReportDataSource("DataSet1", dsDataSet1.Tables[1]);
+            string Civ = dsDataSet1.Tables[1].Rows[0][0].ToString().Trim();
+            string Nom = dsDataSet1.Tables[1].Rows[0][1].ToString().Trim();
+            string Prenom = dsDataSet1.Tables[1].Rows[0][2].ToString().Trim();
+
+            string lsSql2 = "SELECT DISTINCT "+
+                         "FOYER_ADRESSE.TXT_AD2, CASE WHEN NOT FOYER_ADRESSE.IDF_VOI IS NULL "+
+                         "THEN FOYER_ADRESSE.NUM_VOI + ' ' + VOIE.LIL_VOI "+
+						 "ELSE FOYER_ADRESSE.TXT_AD1 END AS AD1 "+
+"FROM            FOYER_ADRESSE LEFT OUTER JOIN "+
+                        " VOIE ON FOYER_ADRESSE.IDF_VOI = VOIE.IDF_VOI "+
+"WHERE        (FOYER_ADRESSE.IDF_FOY = "+Foyer+")";                        
+           
+          // "AND TXT_CIV != 'enf'";
+            DataSet1 dsDataSet2 = GetData(lsSql2);
+            ReportDataSource datasource2 = new ReportDataSource("DataSet1", dsDataSet2.Tables[1]);
+            string TXT_AD1 = dsDataSet2.Tables[1].Rows[0][1].ToString().Trim();
+            string TXT_AD2 = dsDataSet2.Tables[1].Rows[0][0].ToString().Trim();
+            if(TXT_AD2 == "")
+            {
+                TXT_AD2 = " ";
+            }
+
+
+            string RequeteVille = "SELECT COMMUNE.NUM_CPO,COMMUNE.TXT_COM " +
+                                  "FROM COMMUNE, FOYER_ADRESSE " +
+                                  "WHERE COMMUNE.IDF_COM = FOYER_ADRESSE.IDF_COM " +
+                                  "AND  FOYER_ADRESSE.IDF_FOY = " + Foyer;
+            DataSet1 dsDataSet3 = GetData(RequeteVille);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            ReportDataSource datasource3 = new ReportDataSource("DataSet1", dsDataSet3.Tables[1]);
+            string CP = dsDataSet3.Tables[1].Rows[0][0].ToString().Trim();
+            string Ville = dsDataSet3.Tables[1].Rows[0][1].ToString().Trim();
+
+            string RequeteM = "SELECT top 1 PERSONNE.TXT_CIV , PERSONNE.TXT_NOM, PERSONNE.TXT_PRE " +
+            "FROM PERSONNE " +
+            "WHERE PERSONNE.IDF_FOY = " + Foyer + 
+            "AND TXT_CIV != 'enf'";
+            DataSet1 dsDataSet4 = GetData(RequeteM);
+            ReportDataSource datasource4 = new ReportDataSource("DataSet1", dsDataSet4.Tables[1]);
+            string en_tete = dsDataSet4.Tables[1].Rows[0][0].ToString().Trim();
+            if (en_tete == "M")
+            {
+                en_tete = "Monsieur,";
+            }
+            else
+                en_tete = "Madame,";
+
+            if (TXT_AD2 == " ")
+            {
+               
+            }
+            else
+                TXT_AD1 += Environment.NewLine;
+
+            //Recuperation Nom Affaire Suivie
+            ReportDataSource datasourcr9 = new ReportDataSource("DataSet1", RecupererNom_PrenomId().Tables[1]);
+            string PrenomId = RecupererNom_PrenomId().Tables[1].Rows[0][0].ToString().Trim();
+            string NomId = RecupererNom_PrenomId().Tables[1].Rows[0][1].ToString().Trim();
+
+            //Recuperation Tel Id
+            ReportDataSource datasource10 = new ReportDataSource("DataSet1", RecupererTelId().Tables[1]);
+            string Tel = RecupererTelId().Tables[1].Rows[0][0].ToString().Trim();
+            string Fax = RecupererTelId().Tables[1].Rows[0][1].ToString().Trim();
+            string Mail = RecupererTelId().Tables[1].Rows[0][2].ToString().Trim();
+
+            //lblTest.Text = "Après étude de votre dossier, j'ai le regret de vous informer que " + decision;
+            ReportParameter p1 = new ReportParameter("Decision", "Après étude de votre dossier, j'ai le regret de vous informer que " + decision + ".");
+            ReportParameter p3 = new ReportParameter("CIV", Civ+" ");
+            ReportParameter p4 = new ReportParameter("Nom", Nom + " ");
+            ReportParameter p5 = new ReportParameter("Prenom", Prenom + " ");
+            ReportParameter p6 = new ReportParameter("TXT_AD1", TXT_AD1);
+            ReportParameter p7 = new ReportParameter("TXT_AD2", TXT_AD2);
+            ReportParameter p8 = new ReportParameter("CP", CP+" ");
+            ReportParameter p9 = new ReportParameter("Ville", Ville);
+            ReportParameter p10 = new ReportParameter("En_Tete", en_tete);
+            ReportParameter p11 = new ReportParameter("Affaire", "Affaire suivie par : "+PrenomId + " "+ NomId);
+            ReportParameter p12 = new ReportParameter("Tel","Tél. : "+ Tel + " ");
+            ReportParameter p13 = new ReportParameter("Fax", "Fax : " + Fax + " ");
+            ReportParameter p14 = new ReportParameter("email", "email : " + Mail + " ");
+         /*   if (p7.ToString() == "")
+            {
+                
+                this.ReportViewer1.LocalReport.SetParameters(new ReportParameter[] { p1, p3, p4, p5, p6, p8, p9, p10 });
+
+            }else*/
+
+            this.ReportViewer1.LocalReport.SetParameters(new ReportParameter[] { p1,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14 });
+            ReportViewer1.LocalReport.DataSources.Add(datasource);
+            ReportViewer1.LocalReport.Refresh();
+            ReportViewer1.ShowReportBody = false;
+            ReportViewer1.Visible = false;
+            BntCacher.Visible = false;
+            btnPdf.Visible = true;
+            btnAfficher.Visible = true;
+        }
+
+        protected void btnAccueil_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Index.aspx");
+        }
+
+        protected void btnConfirm_Click(object sender, EventArgs e)
+        {
+            lblRejet.Visible = true;
+            ListeRejet.Visible = true;
+            btnRechercherRej.Visible = true;
+            btnPdf.Visible = false;
+            btnAfficher.Visible = false;
+            BntCacher.Visible = false;
+        }
+        protected void btnPdf_Click(object sender, EventArgs e)
+        {
+            lblTest.Visible = true;
+            Warning[] warnings;
+            string[] streamids;
+            string mimeType;
+            string encoding;
+            string extension;
+
+            byte[] bytes = ReportViewer1.LocalReport.Render(
+               "PDF", null, out mimeType, out encoding,
+                out extension,
+               out streamids, out warnings);
+            string nomUtilisateur = Environment.UserName;
+            string fichier = "Rejet";
+            string Document = @"C:\\Users\\" + nomUtilisateur + "\\Documents\\" + fichier + "\\";
+            string adresse = Document + "DocRejet_";
+
+            if (Directory.Exists(Document))
+            {
+                FileStream fs = new FileStream(adresse + DropDownList1.SelectedValue + "_" + ListeRejet.SelectedValue + ".PDF", FileMode.Create);
+                fs.Write(bytes, 0, bytes.Length);
+                fs.Close();
+
+             lblTest.Text = "Document enregistré dans le dossier "+fichier+" sous le nom : DocSecours_"+ DropDownList1.SelectedValue + "_" + ListeRejet.SelectedValue + ".PDF";
+            }
+
+            else
+                System.IO.Directory.CreateDirectory(Document);
+            FileStream fs1 = new FileStream(adresse + DropDownList1.SelectedValue + "_" + ListeRejet.SelectedValue + ".PDF", FileMode.Create);
+            fs1.Write(bytes, 0, bytes.Length);
+            fs1.Close();
+            lblTest.Text = "Document enregistré dans le dossier " + fichier + " sous le nom : DocSecours_" + DropDownList1.SelectedValue + "_" + ListeRejet.SelectedValue + ".PDF";
+        }
+
+        protected void btnAfficher_Click(object sender, EventArgs e)
+        {
+            ReportViewer1.Visible = true;
+            ReportViewer1.ShowReportBody = true;
+            BntCacher.Visible = true;
+            btnAfficher.Visible = false;
+        }
+
+        protected void BntCacher_Click(object sender, EventArgs e)
+        {
+            ReportViewer1.Visible = false;
+            BntCacher.Visible = false;
+            btnAfficher.Visible = true;
+        }
+
+        private DataSet1 RecupererNom_PrenomId()
+        {
+            string requeteUSER = "SELECT UTILISATEUR.TXT_PRE, UTILISATEUR.TXT_Nom " +
+                                    "FROM UTILISATEUR " +
+                                    "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+            DataSet1 dsDataSetId = GetData(requeteUSER);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetId;
+
+        }
+
+        private DataSet1 RecupererTelId()
+        {
+            string requeteTel = "SELECT UTILISATEUR.TXT_PST ,UTILISATEUR.TXT_FAX ,UTILISATEUR.TXT_MEL " +
+                                    "FROM UTILISATEUR " +
+                                    "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+            DataSet1 dsDataSetTelId = GetData(requeteTel);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetTelId;
+
+        }
+
+        protected void btnChange_Click(object sender, EventArgs e)
+        {
+           
+            btnApprouver.Visible = true;
+            listeChange.Visible = true;
+          
+        }
+
+        protected void btnApprouver_Click(object sender, EventArgs e)
+        {
+            string requeteUSER = "SELECT UTILISATEUR.TXT_COD " +
+                                "FROM UTILISATEUR " +
+                                  "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+            DataSet1 dsDataSetfoyer = GetData(requeteUSER);
+            ReportDataSource datasource8 = new ReportDataSource("DataSet1", dsDataSetfoyer.Tables[1]);
+            string nouveau = dsDataSetfoyer.Tables[1].Rows[0][0].ToString().Trim();
+              lblUser.Text = "Connecter sous le nom : " + nouveau;
+        }
+    }
+}

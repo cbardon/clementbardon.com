@@ -1,0 +1,217 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Data.SqlClient;
+using System.Web.Security;
+using System.Configuration;
+using System.Security.Principal;
+
+
+namespace LilouWeb
+{
+    public partial class Login : System.Web.UI.Page
+    {
+
+
+        private void Page_Load(System.Object sender, System.EventArgs e)
+        {
+            // ERROR: Not supported in C#: OnErrorStatement
+            string code = null;
+            string lsUser = null;
+            string lsSql = null;
+            SqlDataReader lnRdr;
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            SqlCommand lcCmd = new SqlCommand();
+
+            if (!IsPostBack)
+            {
+                {
+                    txtUser.Attributes.Add("onkeydown", "RAZ();");
+                    this.txtUser.Attributes.Add("onChange", "this.value=this.value.toUpperCase();");
+                    this.txtPwd.Attributes.Add("onkeydown", "RAZ();");
+                    //  lsUser = HttpContext.Current.User.Identity.Name.ToUpper().ToString();
+                    string tempusername = WindowsIdentity.GetCurrent().Name;
+                    int i = tempusername.IndexOf(@"\");
+                    string username = tempusername.Substring(i + 1, tempusername.Length - i - 1);
+                    lsUser = username.Replace("'", "''").ToUpper();
+                    txtUser.Text = lsUser;
+                }
+                try
+                {
+                    if (lsUser != "" && Request.QueryString["Deco"] != "1")
+                    {
+                        //  lnCon = new SqlConnection(ConfigurationManager.ConnectionStrings["srv-sql.Lilou"].ConnectionString);
+                        lnCon.Open();
+                        if (code != null)
+                        {
+                            //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                            txtUser.Text = "La connexion à la base de données n'est pas possible !";
+                            lnCon.Close();
+                            return;
+                        }
+
+                        // Vérification Nom et mot de passe
+                        lsSql = "SELECT UTILISATEURS.IDF_USR,UTILISATEURS.TXT_PWD FROM UTILISATEURS WHERE UPPER(UTILISATEURS.TXT_COD)='" + lsUser.Replace("'", "''").ToUpper() + "'";// <-------------
+                        lcCmd = new SqlCommand(lsSql, lnCon);
+                        lnRdr = lcCmd.ExecuteReader();
+
+                        if (lnRdr.Read())
+                        {
+                            if (Convert.ToInt32(lnRdr["IDF_USR"]) > 0)
+                            {
+                                // laisser passer, utilisateur connu 
+                                lnRdr.Close();
+                                lnCon.Close();
+                                RechercheDroits(true);
+                                return;
+                            }
+                            else
+                            {
+                                this.txtUser.Text = lsUser;
+                                this.txtPwd.Focus();
+                            }
+                        }
+                        else
+                        {
+                            this.txtUser.Text = lsUser;
+                            this.txtPwd.Focus();
+                        }
+                    }
+                    else
+                    {
+                        this.txtUser.Focus();
+                    }
+                }
+
+
+
+                catch (Exception Error)
+                {
+                    txtErreur.Text = Error.Message;
+                    code = txtErreur.Text;
+                }
+
+            }
+            // MouseMove et out du bouton de validation
+            this.cmdOk.Attributes.Add("onmouseout", "javascript:document.getElementById('cmdOk').src='Images/connect1.bmp';");
+            this.cmdOk.Attributes.Add("onmousemove", "javascript:document.getElementById('cmdOk').src='Images/connect2.bmp';");
+        }
+
+        public void messageBox(string vsMsg, string Ctrl = "")
+        {
+            // ERROR: Not supported in C#: OnErrorStatement
+            ClientScript.RegisterStartupScript(typeof(string), "", "<script language=\"javascript\">alert('" + vsMsg + "');</script>");
+            if (!string.IsNullOrEmpty(Ctrl))
+                Page.FindControl(Ctrl).Focus();
+        }
+
+        protected void cmdOk_Click(object sender, System.Web.UI.ImageClickEventArgs e)
+        {
+            RechercheDroits(false);
+        }
+
+        public void RechercheDroits(bool vbUserLdap)
+        {
+            // ERROR: Not supported in C#: OnErrorStatement
+            string code = null;
+            string lsSql;
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlDataReader lnRdrDroits;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                txtErreur.Text = Error.Message;
+                code = txtErreur.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtUser.Text = "la connexion à l'environnement de " + (this.chkTest.Checked ? "test" : "production") + " a échoué !";
+                lnCon.Close();
+                return;
+            }
+
+            // Vérification Nom et mot de passe
+            lsSql = "SELECT UTILISATEURS.IDF_USR,UTILISATEURS.TXT_PWD,UTILISATEURS.TXT_COD";
+            lsSql += " FROM UTILISATEURS";
+            lsSql += " WHERE UPPER(UTILISATEURS.TXT_COD)='" + this.txtUser.Text.ToUpper() + "'";
+            lcCmd = new SqlCommand(lsSql, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            // string source = lnRdr["TXT_PWD"].ToString();
+            //string look = lnRdr["TXT_PWD"].ToString();
+
+            if (!lnRdr.Read())
+            {
+                txtUser.Text = "L'utilisateur " + this.txtUser.Text + " est inconnu !";
+                lnRdr.Close();
+                lnCon.Close();
+                return;
+            }
+            else if (!vbUserLdap)
+            {
+                if (lnRdr["TXT_PWD"].ToString() != this.txtPwd.Text)
+                {
+                    lnRdr.Close();
+                    lnCon.Close();
+                    return;
+                }
+            }
+
+            // Mémorisation des infos 
+            Session["UsrLogin"] = this.txtUser.Text;
+            Session["UsrIdf"] = lnRdr["IDF_USR"];
+            lnRdr.Close();
+            lcCmd.Dispose();
+
+            // Lecture des droits utilisateur    
+            lsSql = "SELECT UTILISATEURS_APPLICATIONS.IDF_APP";
+            lsSql += " FROM UTILISATEURS_APPLICATIONS";
+            lsSql += " WHERE UTILISATEURS_APPLICATIONS.IDF_USR=" + Session["UsrIdf"];
+            lcCmdD = new SqlCommand(lsSql, lnCon);
+            lnRdrDroits = lcCmdD.ExecuteReader();
+            while (lnRdrDroits.Read())
+            {
+                Session[lnRdrDroits["IDF_APP"].ToString()] = lnRdrDroits["IDF_APP"];
+            }
+            lnRdrDroits.Close();
+            lcCmdD.Dispose();
+            lnCon.Close();
+            FormsAuthentication.RedirectFromLoginPage(this.txtUser.Text, false);
+
+            // Appel de la page Lilou
+            Response.Redirect("Main.aspx");
+        }
+
+
+        public void afficheErreur(Control vcControl, string vsMsg)
+        {
+            //ERROR: Not supported in C#: OnErrorStatement
+            this.txtErreur.Text = vsMsg;
+            this.txtErreur.Visible = true;
+            Page.SetFocus(vcControl);
+        }
+
+        protected void cmdOk_Click1(object sender, ImageClickEventArgs e)
+        {
+            RechercheDroits(false);
+        }
+    }
+}
