@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<carareWrap>
+<carare> 
+    <collectionInformation> 
+        <id>CHARC3DICONS12013_ColInfo_1</id>
+        <title lang="en">3D-ICONS Athena RC Collection One - Ottoman Monuments in Thrace, Greece</title>
+        <contacts>
+            <name lang="en">Anestis Koutsoudis</name>
+            <role lang="en">Associate Research Fellow</role>
+            <organization lang="en">Institute for Language and Speech Processing, Multimedia Department, Xanthi's
+            Branch, Athena Research Centre</organization>
+            <address>
+                <roadName>PO BOX 159, Kimmeria Campus</roadName>
+                <townOrCity lang="en">Xanthi</townOrCity>
+                <postcodeOrZipcode>67100</postcodeOrZipcode>
+                <country lang="en">Greece</country>
+            </address>
+            <phone>+302541078787(326)</phone>
+            <fax>+302541063656</fax>
+            <email>akoutsou@ceti.athena-innovation.gr</email>
+        </contacts>
+        <rights>
+            <copyrightCreditLine>ILSP Xanthi's Branch, Athena Research Centre</copyrightCreditLine>
+            <licence>http://creativecommons.org/licenses/by-nc-nd/3.0/</licence>
+        </rights>
+        <language lang="en">en</language>
+        <creation>
+            <createdOn>2013-07-16</createdOn>
+        </creation>
+        <keywords lang="en">Digital replica, 3D, Monument, Greece, Ottoman, Muslims, Thrace, Tomb,Tekke</keywords>
+    </collectionInformation>
+  
+</carare>
+</carareWrap>

@@ -1,0 +1,188 @@
+@startuml
+
+package app {
+  class Ajout{
+modele
+longitude
+latitude
++methodAjouter()
+}
+class application {
+app
++methodApplication()
+}
+
+class Config{
+DB_serveur
+DB_utilisateur
+DB_motdepasse
+DB_base
+connection
++methodConnectionBDD()
+}
+
+class connect{
+login
+motdepasse
+sql
+requete_1
+requete_2
+result
+lastconnection
+lastjour
+nbr_essai
+update
+sqlNom
+sqlPrenom
+requete_sqlNom
+requete_sqlPrenom
+result1
+result2
+_SESSION['nom']
+_SESSION['prenom']
++methodConnection()
+}
+class deconnexion{
+_SESSION['nom']
+_SESSION['prenom']
++methodDeco()
+~session_destroy()
+
+}
+class formmail{
+TO
+h
+message
++methodEnvoiMail()
+}
+class inscription{
+mail
+passe
+passe2
+mail
+nom
+prenom
++methodInscription()
+}
+class mail{
+mail
+passage_ligne
+message_txt
+message_html
+boundary
+sujet
+header
+message
++methodEnvoiMail()
+}
+
+class Visualisation{
+}
+
+}
+package src {
+  class app{
+app
++RenvoiIndex()
++fRenvoiAdministration()
++RenvoiAjouter()
++RenvoiPresentation()
++RenvoiInscription()
++RenvoiDocumentation()
++RenvoiAuthentification()
++RenvoiContact()
++RenvoiErreur()
++RenvoiVisualisation()
++getMessage($num)
++chercherPhotos()
+}
+}
+package vendor {
+  class autoload
+}
+package web {
+  class index{
+app
+}
+package view{
+class Administration
+class Ajout.twig 
+class Authentification 
+class base
+class base2
+class Contact 
+class documentation
+class Erreur
+class index.twig
+class inscription.twig
+class Presentation
+class Visualisation.twig
+}
+
+package media{
+
+package css{
+class foundation
+class foundation.min
+class normalize
+class style
+}
+
+package img{
+package carrousel{
+}
+}
+package js{
+package foundation{
+}
+package js.vendor{
+}
+
+class foundation
+class three
+class presentation
+
+}
+
+ Ajout <--  Ajout.twig
+ connect <--  Authentification
+ inscription <--  inscription.twig
+ base <--  application
+ base2 <--  application
+ mail <--  inscription
+ formmail <--  Contact
+ Config <--  connect
+ autoload <-- application
+ app <--  Contact
+ app <--  Ajout.twig
+ app <--  Authentification
+ app <--  inscription.twig
+ app <--  Presentation
+ app <--  Administration
+ carrousel <-- app
+base <|-- Ajout.twig
+base <|-- Authentification
+base <|-- inscription.twig
+base <|-- Administration
+base <|-- documentation
+base <|-- Presentation
+base <|-- Contact
+base <|-- index.twig
+base2 <|-- Erreur 
+js.vendor <-- base
+js.vendor <-- base2
+foundation <-- base
+foundation <-- base2
+css <-- base
+css <-- base2
+js.carrousel <-- index
+three <-- Visualisation.twig
+Visualisation <-- Visualisation.twig
+base <|-- Visualisation.twig
+app <-- Visualisation.twig
+app <-- documentation
+deconnexion <-- base
+deconnexion <-- base2
+
+@enduml
+

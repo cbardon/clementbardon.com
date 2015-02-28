@@ -1,0 +1,539 @@
+using Microsoft.Reporting.WebForms;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.IO;
+
+
+namespace Arrete
+{
+    public partial class Visionneuse : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (!IsPostBack)
+            {
+                btnRecherche.Visible = false;
+                ListeAccord.Visible = false;
+                lblAccord.Visible = false;
+                lblTest.Visible = false;
+                ReportViewer1.ShowReportBody = false;
+                ReportViewer1.Visible = false;
+                BntCacher.Visible = false;
+                btnPdf.Visible = false;
+                btnAfficher.Visible = false;
+                btnApprouver.Visible = false;
+                listeChange.Visible = false;
+                lblUser.Text += Environment.UserName.ToUpper();
+            }
+        }        
+
+        // Quand on clique sur le bouton Confirmer
+        protected void btnConfirm_Click(object sender, EventArgs e)
+        {
+            btnRecherche.Visible = true;
+            ListeAccord.Visible = true;
+            lblAccord.Visible = true;
+        }
+
+        //Quand on clique sur le bouton Recherche Accord
+        protected void btnRecherche_Click(object sender, EventArgs e)
+        {
+            ReportViewer1.Visible = true;
+            // Dans le cas de secours d'urgence
+            if (ListeDemande.SelectedValue == "URG")
+            {
+                // Recuperation Montant
+                ReportDataSource datasource = new ReportDataSource("DataSet1", RecupererMontant().Tables[1]);
+                string montant = RecupererMontant().Tables[1].Rows[0][0].ToString().Trim();
+
+                // Recuperation Foyer
+                ReportDataSource datasourceFoyer = new ReportDataSource("DataSet1", RecupererFoyer(ListeAccord.SelectedValue).Tables[1]);
+                string Foyer = RecupererFoyer(ListeAccord.SelectedValue).Tables[1].Rows[0][0].ToString().Trim();
+
+                // Recuperation Civilité
+                ReportDataSource datasource5 = new ReportDataSource("DataSet1", RecupererCiv(Foyer).Tables[1]);
+                string Civ = RecupererCiv(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                string Nom = RecupererCiv(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                string Prenom = RecupererCiv(Foyer).Tables[1].Rows[0][2].ToString().Trim();
+
+                // Recuperation Adresse Foyer
+                ReportDataSource datasource6 = new ReportDataSource("DataSet1", RecupererAdresse(Foyer).Tables[1]);
+                string TXT_AD1 = RecupererAdresse(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                string TXT_AD2 = RecupererAdresse(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                if (TXT_AD2 == "")
+                {
+                    TXT_AD2 = " ";
+                }
+
+                // Recuperation Ville Foyer
+                ReportDataSource datasource7 = new ReportDataSource("DataSet1", RecupererVille(Foyer).Tables[1]);
+                string CP = RecupererVille(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                string Ville = RecupererVille(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+
+                // Recuperation M ou Mme
+                ReportDataSource datasource8 = new ReportDataSource("DataSet1", RecupererM(Foyer).Tables[1]);
+                string en_tete = RecupererM(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                if (en_tete == "M")
+                {
+                    en_tete = "Monsieur,";
+                }
+                else
+                    en_tete = "Madame,";
+
+                //Recuperation Nom Affaire Suivie
+                ReportDataSource datasourcr9 = new ReportDataSource("DataSet1", RecupererNom_PrenomId().Tables[1]);
+                string PrenomId = RecupererNom_PrenomId().Tables[1].Rows[0][0].ToString().Trim();
+                string NomId = RecupererNom_PrenomId().Tables[1].Rows[0][1].ToString().Trim();
+
+                //Recuperation Tel Id
+                ReportDataSource datasource10 = new ReportDataSource("DataSet1", RecupererTelId().Tables[1]);
+                string Tel = RecupererTelId().Tables[1].Rows[0][0].ToString().Trim();
+                string Fax = RecupererTelId().Tables[1].Rows[0][1].ToString().Trim();
+                string Mail = RecupererTelId().Tables[1].Rows[0][2].ToString().Trim();
+            
+                // Ajout de parametre , Exemple --> Montant = @Montant dans le Report, puis on passe la chaine de caractère qu'on veut lui insérer
+                ReportParameter p1 = new ReportParameter("Debut", "En réponse à la demande d'aide financière que vous avez déposée auprès de l'Aide Sociale à l'Enfance, j'ai décidé de vous octroyer un secours d'urgence de ");
+                ReportParameter p2 = new ReportParameter("Milieu", montant + " €");
+                ReportParameter p3 = new ReportParameter("Fin", " pour les besoins quotidiens.");
+                ReportParameter p4 = new ReportParameter("Encaissement", "Vous pouvez encaisser ce chèque en numéraire auprès de votre trésorerie.");
+                ReportParameter p5 = new ReportParameter("Pied", "Je vous prie de bien vouloir agréer, " + en_tete + " l'expression de ma considération distinguée.");
+                ReportParameter p6 = new ReportParameter("CIV", Civ + " ");
+                ReportParameter p7 = new ReportParameter("Nom", Nom + " ");
+                ReportParameter p8 = new ReportParameter("Prenom", Prenom + " ");
+                ReportParameter p9 = new ReportParameter("TXT_AD1", TXT_AD1);
+                ReportParameter p10 = new ReportParameter("TXT_AD2", TXT_AD2);
+                ReportParameter p11 = new ReportParameter("CP", CP + " ");
+                ReportParameter p12 = new ReportParameter("Ville", Ville);
+                ReportParameter p13 = new ReportParameter("En_Tete", en_tete);
+                ReportParameter p14 = new ReportParameter("Parametre", "Affaire suivie par : " + PrenomId + " " + NomId);
+                ReportParameter p15 = new ReportParameter("Tel", "Tél. : " + Tel + " ");
+                ReportParameter p16 = new ReportParameter("Fax", "Fax : " + Fax + " ");
+                ReportParameter p17 = new ReportParameter("email", "email : " + Mail + " ");
+
+                this.ReportViewer1.LocalReport.SetParameters(new ReportParameter[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17 });
+                ReportViewer1.LocalReport.DataSources.Add(datasource);
+                ReportViewer1.LocalReport.Refresh();
+             
+               
+            }
+            else
+                // Dans le cas de secours mensuel
+                if (ListeDemande.SelectedValue == "MEN")
+                {
+                    // Recuperation Montant
+                    ReportDataSource datasource = new ReportDataSource("DataSet1", RecupererMontant().Tables[1]);
+                    string montant = RecupererMontant().Tables[1].Rows[0][0].ToString().Trim();
+
+                    // Recuperation du début 
+                    ReportDataSource datasource1 = new ReportDataSource("DataSet1", RecupererDateDeb().Tables[1]);
+                    DateTime moisDeb = Convert.ToDateTime(RecupererDateDeb().Tables[1].Rows[0][0].ToString().Trim());
+
+                    // Recuperation du mois , exemple --> 01/02/14 , on recupere 02 donc fevrier
+                    string unMoisDeb = moisDeb.ToLongDateString().Split(' ').ElementAt(2);
+
+                    // Recuperation de la fin 
+                    ReportDataSource datasource2 = new ReportDataSource("DataSet1", RecupererDateFin().Tables[1]);
+                    DateTime moisFin = Convert.ToDateTime(RecupererDateFin().Tables[1].Rows[0][0].ToString().Trim());
+                    string unMoisFin = moisFin.ToLongDateString().Split(' ').ElementAt(2);
+
+                    // Recuperation du mois d'encaissement
+                    ReportDataSource datasource3 = new ReportDataSource("DataSet1", RecupererDate().Tables[1]);
+                    DateTime mois = Convert.ToDateTime(RecupererDate().Tables[1].Rows[0][0].ToString().Trim());
+                    string unMois = mois.ToLongDateString().Split(' ').ElementAt(2);
+
+                    // Recuperation Id Foyer
+                    ReportDataSource datasourceFoyer = new ReportDataSource("DataSet1", RecuperationFoyer().Tables[1]);
+                    string Foyer = RecuperationFoyer().Tables[1].Rows[0][0].ToString().Trim();
+
+                    // Recuperation Civilité
+                    ReportDataSource datasource5 = new ReportDataSource("DataSet1", RecupererCiv(Foyer).Tables[1]);
+                    string Civ = RecupererCiv(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                    string Nom = RecupererCiv(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                    string Prenom = RecupererCiv(Foyer).Tables[1].Rows[0][2].ToString().Trim();
+
+                    // Recuperation Adresse Foyer
+                    ReportDataSource datasource6 = new ReportDataSource("DataSet1", RecupererAdresse(Foyer).Tables[1]);
+                    string TXT_AD1 = RecupererAdresse(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                    string TXT_AD2 = RecupererAdresse(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                    if (TXT_AD2 == "")
+                    {
+                        TXT_AD2 = " ";
+                    }
+
+                    // Recuperation Ville Foyer
+                    ReportDataSource datasource7 = new ReportDataSource("DataSet1", RecupererVille(Foyer).Tables[1]);
+                    string CP = RecupererVille(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                    string Ville = RecupererVille(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+
+                    // Recuperation M ou Mme
+                    ReportDataSource datasource8 = new ReportDataSource("DataSet1", RecupererM(Foyer).Tables[1]);
+                    string en_tete = RecupererM(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                    if (en_tete == "M")
+                    {
+                        en_tete = "Monsieur,";
+                    }
+                    else
+                        en_tete = "Madame,";
+
+                    //Recuperation Nom Affaire Suivie
+                    ReportDataSource datasourcr9 = new ReportDataSource("DataSet1", RecupererNom_PrenomId().Tables[1]);
+                    string PrenomId = RecupererNom_PrenomId().Tables[1].Rows[0][0].ToString().Trim();
+                    string NomId = RecupererNom_PrenomId().Tables[1].Rows[0][1].ToString().Trim();
+
+                    //Recuperation Tel Id
+                    ReportDataSource datasource10 = new ReportDataSource("DataSet1", RecupererTelId().Tables[1]);
+                    string Tel = RecupererTelId().Tables[1].Rows[0][0].ToString().Trim();
+                    string Fax = RecupererTelId().Tables[1].Rows[0][1].ToString().Trim();
+                    string Mail = RecupererTelId().Tables[1].Rows[0][2].ToString().Trim();
+
+                    ReportParameter p1 = new ReportParameter("Debut", "En réponse à la demande d'aide financière que vous avez déposée auprès de l'Aide Sociale à l'Enfance, j'ai décidié de vous octoryer une aide mensuelle de " + montant + " € du mois de " + unMoisDeb + " au mois de " + unMoisFin + " Pour ....");
+                    ReportParameter p2 = new ReportParameter("Milieu"," ");
+                    ReportParameter p3 = new ReportParameter("Fin"," ");
+                    ReportParameter p4 = new ReportParameter("Encaissement", "Je vous informe que le mois de " + unMois + " vous sera versé par un chèque trésor que vous pourrez endosser auprès de votre trésorerie.");
+                    ReportParameter p5 = new ReportParameter("Pied", "Je vous prie de croire, "+en_tete+" à l'assurance de ma considération distinguée.");
+                    ReportParameter p6 = new ReportParameter("CIV", Civ + " ");
+                    ReportParameter p7 = new ReportParameter("Nom", Nom + " ");
+                    ReportParameter p8 = new ReportParameter("Prenom", Prenom + " ");
+                    ReportParameter p9 = new ReportParameter("TXT_AD1", TXT_AD1);
+                    ReportParameter p10 = new ReportParameter("TXT_AD2", TXT_AD2);
+                    ReportParameter p11 = new ReportParameter("CP", CP + " ");
+                    ReportParameter p12 = new ReportParameter("Ville", Ville);
+                    ReportParameter p13 = new ReportParameter("En_Tete", en_tete);
+                    this.ReportViewer1.LocalReport.SetParameters(new ReportParameter[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13  });
+                    ReportViewer1.LocalReport.DataSources.Add(datasource);
+                    ReportViewer1.LocalReport.Refresh();
+                   
+                }
+                else
+                    // Dans le cas de secours exceptionel
+                    if (ListeDemande.SelectedValue == "EXC")
+                    {
+                        // Recuperation Montant
+                        ReportDataSource datasource = new ReportDataSource("DataSet1", RecupererMontant().Tables[1]);
+                        string montant = RecupererMontant().Tables[1].Rows[0][0].ToString().Trim();
+
+
+                        // Recuperation Id Foyer
+                        ReportDataSource datasourceFoyer = new ReportDataSource("DataSet1", RecuperationFoyer().Tables[1]);
+                        string Foyer = RecuperationFoyer().Tables[1].Rows[0][0].ToString().Trim();
+
+                        // Recuperation Civilité
+                        ReportDataSource datasource5 = new ReportDataSource("DataSet1", RecupererCiv(Foyer).Tables[1]);
+                        string Civ = RecupererCiv(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                        string Nom = RecupererCiv(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                        string Prenom = RecupererCiv(Foyer).Tables[1].Rows[0][2].ToString().Trim();
+
+                        // Recuperation Adresse Foyer
+                        ReportDataSource datasource6 = new ReportDataSource("DataSet1", RecupererAdresse(Foyer).Tables[1]);
+                        string TXT_AD1 = RecupererAdresse(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+                        string TXT_AD2 = RecupererAdresse(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                        if (TXT_AD2 == "")
+                        {
+                            TXT_AD2 = " ";
+                        }
+
+                        // Recuperation Ville Foyer
+                        ReportDataSource datasource7 = new ReportDataSource("DataSet1", RecupererVille(Foyer).Tables[1]);
+                        string CP = RecupererVille(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                        string Ville = RecupererVille(Foyer).Tables[1].Rows[0][1].ToString().Trim();
+
+                        // Recuperation M ou Mme
+                        ReportDataSource datasource8 = new ReportDataSource("DataSet1", RecupererM(Foyer).Tables[1]);
+                        string en_tete = RecupererM(Foyer).Tables[1].Rows[0][0].ToString().Trim();
+                        if (en_tete == "M")
+                        {
+                            en_tete = "Monsieur,";
+                        }
+                        else
+                            en_tete = "Madame,";
+
+
+                        if (TXT_AD2 == " ")
+                        {
+
+                        }
+                        else
+                            TXT_AD1 += Environment.NewLine;
+
+                        //Recuperation Nom Affaire Suivie
+                        ReportDataSource datasourcr9 = new ReportDataSource("DataSet1", RecupererNom_PrenomId().Tables[1]);
+                        string PrenomId = RecupererNom_PrenomId().Tables[1].Rows[0][0].ToString().Trim();
+                        string NomId = RecupererNom_PrenomId().Tables[1].Rows[0][1].ToString().Trim();
+
+                        //Recuperation Tel Id
+                        ReportDataSource datasource10 = new ReportDataSource("DataSet1", RecupererTelId().Tables[1]);
+                        string Tel = RecupererTelId().Tables[1].Rows[0][0].ToString().Trim();
+                        string Fax = RecupererTelId().Tables[1].Rows[0][1].ToString().Trim();
+                        string Mail = RecupererTelId().Tables[1].Rows[0][2].ToString().Trim();
+
+                        ReportParameter p1 = new ReportParameter("Debut", "En réponse à la demande d'aide financière que vous avez déposée auprès de l'Aide Sociale à l'Enfance, j'ai décidié de vous octoryer une aide exceptionnelle de ");
+                        ReportParameter p2 = new ReportParameter("Milieu", montant + " €");
+                        ReportParameter p3 = new ReportParameter("Fin", " .....");
+                        ReportParameter p4 = new ReportParameter("Encaissement", "Vous pouvez encaisser ce chèque en numéraire auprès de votre trésorerie.");
+                        ReportParameter p5 = new ReportParameter("Pied", "Je vous prie de bien vouloir agréer, " + en_tete + " l'expression de ma considération distinguée.");
+                        ReportParameter p6 = new ReportParameter("CIV", Civ + " ");
+                        ReportParameter p7 = new ReportParameter("Nom", Nom + " ");
+                        ReportParameter p8 = new ReportParameter("Prenom", Prenom + " ");
+                        ReportParameter p9 = new ReportParameter("TXT_AD1", TXT_AD1);
+                        ReportParameter p10 = new ReportParameter("TXT_AD2", TXT_AD2);
+                        ReportParameter p11 = new ReportParameter("CP", CP + " ");
+                        ReportParameter p12 = new ReportParameter("Ville", Ville);
+                        ReportParameter p13 = new ReportParameter("En_Tete", en_tete);
+                        ReportParameter p14 = new ReportParameter("Affaire", "Affaire suivie par : " + PrenomId + " " + NomId);
+                        ReportParameter p15 = new ReportParameter("Tel", "Tél. : " + Tel + " ");
+                        ReportParameter p16 = new ReportParameter("Fax", "Fax : " + Fax + " ");
+                        ReportParameter p17 = new ReportParameter("email", "email : " + Mail + " ");
+
+                        this.ReportViewer1.LocalReport.SetParameters(new ReportParameter[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13 ,p14,p15,p16,p17});
+                        ReportViewer1.LocalReport.DataSources.Add(datasource);
+                        ReportViewer1.LocalReport.Refresh();
+                    }
+
+
+     
+          //  ReportViewer1.LocalReport.DataSources.Add(datasource);
+            ReportViewer1.LocalReport.Refresh();
+            ReportViewer1.ShowReportBody = false;
+            ReportViewer1.Visible = false;
+            BntCacher.Visible = false;
+            btnPdf.Visible = true;
+            btnAfficher.Visible = true;
+        }
+
+
+        //DateSet1
+        private DataSet1 GetData(string query)
+        {
+            string conString = ConfigurationManager.ConnectionStrings["Ase_StageConnectionString"].ConnectionString;
+            SqlCommand cmd = new SqlCommand(query);
+            using (SqlConnection con = new SqlConnection(conString))
+            {
+                using (SqlDataAdapter sda = new SqlDataAdapter())
+                {
+                    cmd.Connection = con;
+                    sda.SelectCommand = cmd;
+                    using (DataSet1 dsDataSet1 = new DataSet1())
+                    {
+                        sda.Fill(dsDataSet1, "DataTable1");
+                        return dsDataSet1;
+                    }
+                }
+            }
+        }
+
+        protected void btnAccueil_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("~/Index.aspx");
+        }
+        
+
+         private DataSet1 RecupererMontant()
+        {
+            ReportViewer1.ProcessingMode = ProcessingMode.Local;
+            ReportViewer1.LocalReport.ReportPath = Server.MapPath("~/Secours.rdlc");
+            ReportViewer1.Visible = true;
+                string lsSql = "SELECT MNT_ACC " +
+                                 "FROM PROC_AIDEFI " +
+                                 "WHERE IDF_AID = " + ListeAccord.SelectedValue;
+                DataSet1 dsDataSetMontant = GetData(lsSql);
+                ReportViewer1.LocalReport.DataSources.Clear();
+                return dsDataSetMontant;
+              
+        }
+
+         private DataSet1 RecupererFoyer(string value)
+         {
+
+             string requeteFoyer = "SELECT PROC_AIDEFI_PER.IDF_FOY " +
+                      "FROM PROC_AIDEFI, PROC_AIDEFI_PER  " +
+                      "WHERE PROC_AIDEFI.IDF_AID = PROC_AIDEFI_PER.IDF_AID  " +
+                      "AND PROC_AIDEFI.IDF_AID =" + value;
+             DataSet1 dsDataSetfoyer = GetData(requeteFoyer);
+             ReportViewer1.LocalReport.DataSources.Clear();
+             return dsDataSetfoyer;
+         }
+
+        private DataSet1 RecupererCiv(string foyer)
+         {
+             string RequeteCiv = "SELECT top 1 PERSONNE.TXT_CIV , PERSONNE.TXT_NOM, PERSONNE.TXT_PRE FROM PERSONNE " +
+                 "WHERE  PERSONNE.IDF_FOY =" + foyer +
+             " AND TXT_CIV != 'enf'";
+
+             DataSet1 dsDataSetCiv = GetData(RequeteCiv);
+             return dsDataSetCiv;
+         }
+
+        private DataSet1 RecupererAdresse(string foyer)
+        {
+            string RequeteAdress = "SELECT DISTINCT " +
+                            "FOYER_ADRESSE.TXT_AD2, CASE WHEN NOT FOYER_ADRESSE.IDF_VOI IS NULL " +
+                            "THEN FOYER_ADRESSE.NUM_VOI + ' ' + VOIE.LIL_VOI " +
+                            "ELSE FOYER_ADRESSE.TXT_AD1 END AS AD1 " +
+   "FROM            FOYER_ADRESSE LEFT OUTER JOIN " +
+                           " VOIE ON FOYER_ADRESSE.IDF_VOI = VOIE.IDF_VOI " +
+   "WHERE        (FOYER_ADRESSE.IDF_FOY = " + foyer + ")";
+
+            // "AND TXT_CIV != 'enf'";
+            DataSet1 dsDataSetRecupererAdresse = GetData(RequeteAdress);
+            return dsDataSetRecupererAdresse;
+        }
+
+        private DataSet1 RecupererVille(string foyer)
+        {
+            string RequeteVille = "SELECT COMMUNE.NUM_CPO,COMMUNE.TXT_COM " +
+                                     "FROM COMMUNE, FOYER_ADRESSE " +
+                                     "WHERE COMMUNE.IDF_COM = FOYER_ADRESSE.IDF_COM " +
+                                     "AND  FOYER_ADRESSE.IDF_FOY = " + foyer;
+            DataSet1 dsDataSetRecupererVille = GetData(RequeteVille);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetRecupererVille;
+        }
+
+        private DataSet1 RecupererM(string foyer)
+        {
+            string RequeteM = "SELECT top 1 PERSONNE.TXT_CIV , PERSONNE.TXT_NOM, PERSONNE.TXT_PRE " +
+                "FROM PERSONNE " +
+                "WHERE PERSONNE.IDF_FOY = " + foyer +
+                "AND TXT_CIV != 'enf'";
+            DataSet1 dsDataSetRecupererM = GetData(RequeteM);
+            return dsDataSetRecupererM;
+        }
+
+        private DataSet1 RecupererDateDeb()
+        {
+            string lsSql1 = "SELECT DAT_DEB " +
+                                   "FROM PROC_AIDEFI " +
+                                   "WHERE IDF_AID = " + ListeAccord.SelectedValue;
+            DataSet1 dsDataSetDateDeb = GetData(lsSql1);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetDateDeb;
+        }
+
+        private DataSet1 RecupererDateFin()
+        {
+            string lsSql2 = "SELECT DAT_FIN " +
+                                  "FROM PROC_AIDEFI " +
+                                  "WHERE IDF_AID = " + ListeAccord.SelectedValue;
+            DataSet1 dsDataSetDateFin = GetData(lsSql2);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetDateFin;
+        }
+
+        private DataSet1 RecupererDate()
+        {
+            string lsSql3 = "SELECT DAT_DEC " +
+                                    "FROM PROC_AIDEFI " +
+                                    "WHERE IDF_AID = " + ListeAccord.SelectedValue;
+            DataSet1 dsDataSetDate = GetData(lsSql3);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetDate;
+        }
+
+        private DataSet1 RecuperationFoyer()
+        {
+            string requeteFoyer = "SELECT PROC_AIDEFI_PER.IDF_FOY " +
+                             "FROM PROC_AIDEFI, PROC_AIDEFI_PER  " +
+                             "WHERE PROC_AIDEFI.IDF_AID = PROC_AIDEFI_PER.IDF_AID  " +
+                             "AND PROC_AIDEFI.IDF_AID =" + ListeAccord.SelectedValue;
+            DataSet1 dsDataSetfoyer = GetData(requeteFoyer);
+            ReportViewer1.LocalReport.DataSources.Clear();
+            return dsDataSetfoyer;
+        }
+
+       
+
+       protected void btnPdf_Click(object sender, EventArgs e)
+        {
+            lblTest.Visible = true;
+            Warning[] warnings;
+            string[] streamids;
+            string mimeType;
+            string encoding;
+            string extension;
+            byte[] bytes = ReportViewer1.LocalReport.Render( "PDF", null, out mimeType, out encoding,out extension,out streamids, out warnings);
+            string nomUtilisateur = Environment.UserName;
+            string fichier = "Secours";
+            string Document=  @"C:\\Users\\"+nomUtilisateur+"\\Documents\\"+fichier+"\\";
+           string adresse = Document +"DocSecours_";
+           
+           if(Directory.Exists(Document))
+        {
+         //   nomUtilisateur = nomUtilisateur.Substring(nomUtilisateur.IndexOf("\\") + 1, nomUtilisateur.Length - nomUtilisateur.IndexOf("\\") - 1);
+            FileStream fs = new FileStream(adresse+ListeDemande.SelectedValue+"_" + ListeAccord.SelectedValue + ".PDF", FileMode.Create);
+            fs.Write(bytes, 0, bytes.Length);
+            fs.Close();
+          lblTest.Text = "Document enregistré dans le dossier "+fichier+" sous le nom : DocSecours_" + ListeDemande.SelectedValue + "_" + ListeAccord.SelectedValue + ".PDF";
+        }
+           else
+               System.IO.Directory.CreateDirectory(Document);
+           FileStream fs1 = new FileStream(adresse + ListeDemande.SelectedValue + "_" + ListeAccord.SelectedValue + ".PDF", FileMode.Create);
+           fs1.Write(bytes, 0, bytes.Length);
+           fs1.Close();
+           lblTest.Text = "Document enregistré dans le dossier " + fichier + " sous le nom : DocSecours_" + ListeDemande.SelectedValue + "_" + ListeAccord.SelectedValue + ".PDF";
+       }
+   
+       protected void btnAfficher_Click(object sender, EventArgs e)
+       {
+           ReportViewer1.Visible = true;
+           ReportViewer1.ShowReportBody = true;
+           BntCacher.Visible = true;
+           btnAfficher.Visible = false;
+       }
+
+       protected void BntCacher_Click(object sender, EventArgs e)
+       {
+           ReportViewer1.Visible = false;
+           BntCacher.Visible = false;
+           btnAfficher.Visible = true;
+       }
+
+       private DataSet1 RecupererNom_PrenomId()
+       {
+           string requeteUSER = "SELECT UTILISATEUR.TXT_PRE, UTILISATEUR.TXT_Nom " +
+                                   "FROM UTILISATEUR " +
+                                    "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+           DataSet1 dsDataSetId = GetData(requeteUSER);
+           ReportViewer1.LocalReport.DataSources.Clear();
+           return dsDataSetId;
+
+       }
+
+       private DataSet1 RecupererTelId()
+       {
+           string requeteTel = "SELECT UTILISATEUR.TXT_PST ,UTILISATEUR.TXT_FAX ,UTILISATEUR.TXT_MEL " +
+                                   "FROM UTILISATEUR " +
+                                     "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+           DataSet1 dsDataSetTelId = GetData(requeteTel);
+           ReportViewer1.LocalReport.DataSources.Clear();
+           return dsDataSetTelId;
+
+       }
+
+       protected void btnChange_Click(object sender, EventArgs e)
+       {
+           btnApprouver.Visible = true;
+           listeChange.Visible = true;
+       }
+
+       protected void btnApprouver_Click(object sender, EventArgs e)
+       {
+           string requeteUSER = "SELECT UTILISATEUR.TXT_COD " +
+                               "FROM UTILISATEUR " +
+                                 "WHERE (IDF_USR = " + listeChange.SelectedValue + ")";
+
+           DataSet1 dsDataSetfoyer = GetData(requeteUSER);
+           ReportDataSource datasource8 = new ReportDataSource("DataSet1", dsDataSetfoyer.Tables[1]);
+           string nouveau = dsDataSetfoyer.Tables[1].Rows[0][0].ToString().Trim();
+           lblUser.Text = "Connecter sous le nom : " + nouveau;
+       }
+    }
+}          

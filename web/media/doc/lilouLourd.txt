@@ -1,0 +1,376 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Lilou
+{
+    public partial class Form1 : Form
+    {
+
+
+        double nb;
+
+        public Form1()
+        {
+            InitializeComponent();
+            
+
+            foreach (string parametre in Environment.GetCommandLineArgs()) 
+            {
+                comboBoxApplication.Items.Add(parametre);
+             
+            }
+        }
+
+        
+
+        private void btnTransfert_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Votre transfert a bien était fait");
+        }
+
+       private void btnQuitter_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Merci d'avoir utiliser l'application Lilou , au revoir");
+            Close();
+            
+        }
+
+      
+
+       private void comboBoxApplication_SelectedIndexChanged_1(object sender, EventArgs e)
+       {
+
+
+           // Civitas --> Carene
+
+           if (comboBoxApplication.SelectedItem == "Civitas-Carene ")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               textBox1.Text = "\\srv-sirh\\fic_RhProd\\delerot.txt";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\172.16.20.3\\KRNXFRAME\\carene\\env_execution\\exploit\\delerot.txt";
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+
+           //Civitas Test --> Carene Test (delerot.txt)
+
+           if (comboBoxApplication.SelectedItem == "CivitasTest-Carene Test")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "\\srv-sirh\\fic_RhTest\\delerot.txt";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\172.16.20.3\\XFRAMTEST\\carene\\env_execution\\exploit\\delerot.txt";
+               listBoxDossier.Items.Add("23");
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+           // Civitas Form --> Carene (delerot.txt)
+
+           if (comboBoxApplication.SelectedItem == "CivitasForm-CareneForm")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               textBox1.Text = "\\srv-sirh\\fic_RhForm\\delerot.txt";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\172.16.20.3\\XFRAMTEST\\carene\\env_execution\\exploit\\delerot.txt";
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+
+
+
+           //Iodas --> Carene (delerot.txt)
+
+           if (comboBoxApplication.SelectedItem == "Iodas-Carene")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "\\srv-iodas\\AppGF\\MDPF_ORA\\Fichiers\\delerot.txt";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+                   textBox2.Text = "\\172.16.20.3\\KRNXFRAME\\carene\\env_execution\\exploit";
+                   listBoxDossier.Items.Add("25");
+               }
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+           //Iodas Test --> Carene Test (delerot.txt) 
+
+           if (comboBoxApplication.SelectedItem == "Iodas Test-Carene Test")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "\\srv-iodas\\AppGF\\MDPT_ORA\\Fichiers\\delerot.txt";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\172.16.20.3\\XFRAMTEST\\carene\\env_execution\\exploit";
+               listBoxDossier.Items.Add("00000");
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+
+
+           // Iodas --> Helios (bfgfp001)
+
+           if (comboBoxApplication.SelectedItem == "Iodas-Helios")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "\\srv-iodas\\AppGF\\MDPH_ORA\\Fichiers\\bfgfp001";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "c:\\Users\\Desktop";
+               listBoxDossier.Items.Add("2424");
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+           // lodas - log (*.nom_utilisateur)
+
+           if (comboBoxApplication.SelectedItem == "Iodas-log")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               listBoxDossier.Items.Add("1");
+               textBox1.Text = "\\srv-iodas\\AppGFI\\MDPH_ORA\\Fichiers\\Users";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "c:\\Users\\Desktop";
+
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+
+
+           //astreintes
+
+           if (comboBoxApplication.SelectedItem == "Trust-Civitas")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\srv-iodas\\Appgfi\\MDPH_ORA\\Lanceurs\\delerot.bat";
+               listBoxDossier.Items.Add("2424");
+
+
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+           //Absence
+
+           if (comboBoxApplication.SelectedItem == "eTemptation-Civitas")
+           {
+               nb = comboBoxApplication.SelectedIndex;
+               textBox1.Text = "";
+               if (textBox1.Text == "")
+               {
+                   label13.Visible = true;
+                   label2.Visible = false;
+                   label3.Visible = false;
+                   textBox1.Visible = false;
+               }
+               else
+               {
+                   label13.Visible = false;
+                   label2.Visible = true;
+                   label3.Visible = true;
+                   textBox1.Visible = true;
+               }
+               textBox2.Text = "\\srv-iodas\\Appgfi\\MDPH_ORA\\Lanceurs\\delerot.bat";
+               listBoxDossier.Items.Add("2424");
+           }
+           else
+               if (comboBoxApplication.SelectedIndex != nb)
+               {
+                   label13.Visible = false;
+                   textBox1.Clear();
+                   textBox2.Clear();
+                   listBoxDossier.Items.Clear();
+               }
+
+       }
+
+     
+
+      
+
+
+
+
+      
+    }
+}
+
+
+            
+           

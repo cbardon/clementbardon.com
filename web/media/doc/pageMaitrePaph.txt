@@ -1,0 +1,36 @@
+<%@ Page Title="" Language="C#" MasterPageFile="~/Site1.Master" AutoEventWireup="true" CodeBehind="WebForm1.aspx.cs" Inherits="WebApplication10.WebForm1" %>
+
+-- Voici le début de ce qui changera dans la page --
+
+<asp:Content ID="Content1" ContentPlaceHolderID="Corps" runat="server">
+    <article>
+    <asp:Image ID="Image1" runat="server" src="Images/cg15.png" style="width:auto"/>
+       
+        
+      <p>Pour afficher la boite, cliquer sur le lien  <a href="#" onclick="document.getElementById('shadowing').style.display='block';
+	  document.getElementById('box').style.display='block';">ouvrir</a> 
+</p>
+
+<div id="shadowing" onClick="document.getElementById('box').style.display='none';
+   document.getElementById('shadowing').style.display='none'"></div>
+<div id="box">
+	<div id="boxheader" style="background-color:gray; text-align:center"> Popup de test
+   <span id="boxclose" onClick="document.getElementById('box').style.display='none';
+   document.getElementById('shadowing').style.display='none'"> <asp:ImageButton ID="ImageButton5" runat="server"  ImageUrl ="Images/close.gif" ImageAlign="Right"/></span>
+	</div>
+	<div id="boxcontent">
+Ceci est un test<br><br>
+Bonjour , création de la nouvelle popup
+
+        <asp:Image ID="Image3" runat="server" ImageUrl ="Images/smiley.jpg" />
+	</div>
+</div>
+
+       
+
+
+    </article>
+
+-- Voici la fin du changement de la page --
+
+</asp:Content>

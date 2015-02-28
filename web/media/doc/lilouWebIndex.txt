@@ -1,0 +1,479 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Diagnostics;
+using System.Security.Principal;
+using System.Data.SqlClient;
+using System.Web.Security;
+
+namespace LilouWeb
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        //Adresse de bureau sous Windows Xp
+        string xp = "C:" + "\\" + "\\Documents and Settings\\All Users\\Desktop\\";
+        //Adresse de bureau sous Windows Vista, Serveur et 7
+        string Vista_Srv_7 = "C:" + "\\" + "\\Users\\Public\\Desktop\\";
+        //Adresse de bureau selon l'Os
+        string bureau;
+        string sourceFile, test;
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            ErrDos.Visible = false;
+            string lsUser;
+            if (GetOSVersion() == "5")
+                bureau = xp;
+            else
+                bureau = Vista_Srv_7;
+            //Recuperation nom de l'utilisateur
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            string lsSql;
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                string code = lblErr.Text;
+            }
+
+            lsSql = "SELECT UTILISATEURS.TXT_NOM, UTILISATEURS.TXT_PRENOM";
+            lsSql += " FROM UTILISATEURS";
+            lsSql += " WHERE UTILISATEURS.IDF_USR =" + "'" + Session["UsrIdf"] + "'";
+            lcCmdD = new SqlCommand(lsSql, lnCon);
+            lnRdr = lcCmdD.ExecuteReader();
+            lnRdr.Read();
+            string nom = lnRdr["TXT_NOM"].ToString();
+            string prenom = lnRdr["TXT_PRENOM"].ToString();
+            lnRdr.Close();
+            Accepter.Visible = false;
+            /*string tempusername = WindowsIdentity.GetCurrent().Name;
+            int i = tempusername.IndexOf(@"\");
+            string username = tempusername.Substring(i + 1, tempusername.Length - i - 1);
+            lsUser = username;*/
+            this.lblSes.Text = Session["UsrIdf"].ToString();
+            lblUser.Text = "Bienvenue " + prenom + " " + nom;
+        }
+
+
+        public void cboApp_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtSou.Visible = false;
+            string source, des, lan, des_lan;
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            String code = null;
+            string lsSql, lsSql1, lsSql2;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+
+            if (code != null)
+            {
+                //MsgBox "Problème lors de l'ouverture de la base de données " & Chr$(10) & Error(err) & " - " & err & Chr$(10) & "(" & gsFicIni & ")", gcCrOk, "Ouverture de la base"
+                txtSou.Text = "la connexion à l'environnement a échoué !";
+                lnCon.Close();
+                return;
+            }
+            //Recuperation de la source 
+            lsSql = "SELECT APPLICATIONS.TXT_SOU";
+            lsSql += " FROM APPLICATIONS";
+            lsSql += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            source = lnRdr["TXT_SOU"].ToString();
+            lnRdr.Close();
+
+            //Recuperation de la destination 
+            lsSql1 = "SELECT APPLICATIONS.TXT_DES";
+            lsSql1 += " FROM APPLICATIONS";
+            lsSql1 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql1, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            des = lnRdr["TXT_DES"].ToString();
+            lnRdr.Close();
+
+            //Recuperation du lanceur
+            lsSql2 = "SELECT APPLICATIONS.TXT_LAN";
+            lsSql2 += " FROM APPLICATIONS";
+            lsSql2 += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSql2, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            lan = lnRdr["TXT_LAN"].ToString();
+            lnRdr.Close();
+
+            //Soit la destination ou le lanceur
+            if (des == "")
+                des_lan = lan;
+            else
+                des_lan = des;
+
+            if (cboApp.SelectedItem.ToString() != "Choisir une application")
+            {
+                ErrApp.Visible = false;
+            }
+
+            //Choisir une application 
+            if (cboApp.SelectedItem.ToString() == "Choisir une application")
+            {
+                cblDos.Items.Clear();
+                txtSou.Text = "";
+                txtDes_Lan.Text = "";
+                txtDes_Lan.Visible = false;
+            }
+            else
+            {
+                cblDos.Items.Clear();
+                txtSou.Text = source;
+                this.cache();
+                txtDes_Lan.Text = des_lan;
+
+            }
+            changement(cboApp.SelectedIndex);
+
+
+            if (cboApp.SelectedItem.ToString() != "0")
+            {
+                boucle();
+                changement(cboApp.SelectedIndex);
+            }
+
+            //Si un seul élément , case cochée directement
+            if (cblDos.Items.Count == 1)
+            {
+                cblDos.Items[0].Selected = true;
+            }
+
+        }
+
+        // Reconnaitre la version de l'OS
+        public static string GetOSVersion()
+        {
+            int OsVersion = Environment.OSVersion.Version.Major;
+            switch (OsVersion)
+            {
+                case 5:
+                    return "Windows XP";
+                case 6:
+                    switch (Environment.OSVersion.Version.Minor)
+                    {
+                        case 0:
+                            return "Windows Vista";
+                        case 1:
+                            return "Windows 7";
+                        default:
+                            return "Windows Vista & above";
+                    }
+                default:
+                    return "Unknown";
+            }
+        }
+
+        //Fonction pour cacher les differents éléments de l'application en fonction du choix de l'utilisateur
+        private void cache()
+        {
+            if (txtSou.Text == "")
+            {
+                lblLan.Visible = true;
+                lblSou.Visible = false;
+                lblDes.Visible = false;
+                txtSou.Visible = false;
+                lblMod3.Visible = false;
+                lblMod4.Visible = false;
+                lblMod5.Visible = false;
+                lblMod6.Visible = false;
+                lblMod4Bis.Visible = true;
+                lblMod3Bis.Visible = true;
+                lblDos.Visible = false;
+                txtDes_Lan.Visible = true;
+            }
+            else
+            {
+                lblLan.Visible = false;
+                lblSou.Visible = true;
+                lblDes.Visible = true;
+                txtSou.Visible = true;
+                lblMod3.Visible = true;
+                lblMod4.Visible = true;
+                lblMod5.Visible = true;
+                lblMod6.Visible = true;
+                lblMod4Bis.Visible = false;
+                lblMod3Bis.Visible = false;
+                lblDos.Visible = true;
+                txtDes_Lan.Visible = true;
+                txtSou.Visible = true;
+            }
+        }
+
+        //Fonction en cas de changement de ligne choisi dans la CheckListBox
+        private void changement(int nb)
+        {
+            if (cboApp.SelectedIndex != nb)
+            {
+                Accepter.Visible = false;
+                lblLan.Visible = false;
+                txtSou.Text = "";
+                txtDes_Lan.Text = "";
+                cblDos.Items.Clear();
+                ErrApp.Text = "";
+                txtDes_Lan.Visible = true;
+                ErrDos.Visible = false;
+            }
+            int o = cblDos.SelectedIndex;
+            if (cblDos.SelectedIndex != o)
+            {
+                ErrDos.Visible = false;
+                ErrApp.Text = "";
+            }
+        }
+
+        //Fonction pour afficher les éléments des fichiers
+        private void boucle()
+        {
+            int compteur = 0;
+            SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+            string lsSou, lsVar, serveur, variable = "", code;
+            SqlCommand lcCmd = new SqlCommand();
+            SqlCommand lcCmdD = new SqlCommand();
+            SqlDataReader lnRdr;
+            SqlCommand lcCmd2 = new SqlCommand();
+            try
+            {
+                lnCon.Open();
+            }
+            catch (Exception Error)
+            {
+                lblErr.Text = Error.Message;
+                code = lblErr.Text;
+            }
+            //Recuperation Source
+            lsSou = "Select APPLICATIONS.TXT_SOU";
+            lsSou += " FROM APPLICATIONS";
+            lsSou += " WHERE APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsSou, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            lnRdr.Read();
+            serveur = lnRdr["TXT_SOU"].ToString();
+            lnRdr.Close();
+
+            //Recuperation variable de recherche 
+            lsVar = "SELECT RECHERCHE.TXT_LBL";
+            lsVar += " FROM RECHERCHE,APPLICATIONS";
+            lsVar += " WHERE RECHERCHE.IDF_APP = APPLICATIONS.IDF_APP AND APPLICATIONS.TXT_LBL =" + "'" + cboApp.SelectedItem.ToString() + "'";
+            lcCmd = new SqlCommand(lsVar, lnCon);
+            lnRdr = lcCmd.ExecuteReader();
+            while (lnRdr.Read())
+            {
+                variable = lnRdr["TXT_LBL"].ToString();
+                compteur = 1;
+
+                if (variable != "")
+                {
+                    for (int j = 0; j < compteur; j++)
+                    {
+                        String[] files = Directory.GetFiles(serveur, "*" + variable);
+                        for (int i = files.Length; i > 0; i--)
+                        {
+                            cblDos.Items.Add(files[i - 1]);
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    String[] files = Directory.GetFiles(txtSou.Text);
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        cblDos.Items.Add(files[i]);
+                    }
+                }
+
+            }
+        }
+       
+        public void cblDos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int ligne = cboApp.SelectedIndex;
+            if (ligne == -1)
+            {
+            }
+            else
+                ErrDos.Visible = false;
+            ErrApp.Text = "";
+        }
+
+        protected void txtSou_TextChanged(object sender, EventArgs e)
+        {
+        }
+
+        protected void imgDec_Click(object sender, ImageClickEventArgs e)
+        {
+            FormsAuthentication.SignOut();
+            Session.Clear();
+            Session.Abandon();
+            Response.Redirect("Login.aspx?Deco=1");
+        }
+
+        protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+        {
+            int num = 0;
+
+            //Verification application choisie
+            if (cboApp.SelectedIndex == 0)
+            {
+                ErrApp.Visible = true;
+                ErrApp.Text = "Veuiller choisir une application";
+                ErrDos.Visible = false;
+            }
+            else
+                //Verification case cochée
+                if (cblDos.SelectedItem == null && txtSou.Text != "")
+                {
+                    ErrDos.Visible = true;
+                    ErrDos.Text = "Veuillez cocher un fichier";
+                }
+                else
+                    //Verification des 2 zones de textes
+                    if (txtSou.Text != "" && txtDes_Lan.Text != "")
+                    {
+                        for (int i = 0; i < cblDos.Items.Count; i++)
+                        {
+                            if (cblDos.Items[i].Selected)
+                                num++;
+                        }
+                        if (num != 1)
+                        {
+                            for (int i = 0; i < num; i++)
+                            {
+                                this.test = Convert.ToString(cblDos.Items[i]);
+                                string oldString = @test;
+                                //Soustraction de 2 chaines de caractères pour recuperer le nom du fichier
+                                string newString = oldString.Replace(txtSou.Text, string.Empty);
+                                //Ajout du nom de fichier selectionner a l'adresse de destination
+                                string DestFile = txtDes_Lan.Text + newString;
+                                // Selection de la valeur coché
+                                sourceFile = test;
+                                //Transfert de fichier avec la source et la destination 
+                                System.IO.File.Copy(this.@sourceFile, @DestFile, true);
+                            }
+                            Accepter.Visible = true;
+                            cblDos.Items.Clear();
+                            cboApp.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            this.test = this.cblDos.SelectedItem.ToString();
+                            string oldString = @test;
+                            //Soustraction de 2 chaines de caractères pour recuperer le nom du fichier
+                            string newString = oldString.Replace(txtSou.Text, string.Empty);
+                            //Ajout du nom de fichier selectionner a l'adresse de destination
+                            string DestFile = txtDes_Lan.Text + newString;
+                            // Selection de la valeur coché
+                            sourceFile = test;
+                            //Transfert de fichier avec la source et la destination 
+                            System.IO.File.Copy(this.@sourceFile, @DestFile, true);
+                            Accepter.Visible = true;
+                            cblDos.Items.Clear();
+                            cboApp.SelectedIndex = 0;
+                        }
+                    }
+                    else
+                        //Lanceur .bat
+                        if (txtDes_Lan.Text != "" && txtSou.Visible == false)
+                        {
+                            Process.Start(txtDes_Lan.Text);
+                            Accepter.Visible = true;
+                        }
+        }
+        protected void cmdDeco_Click(object sender, EventArgs e)
+        {
+            Response.Write("<script language='javascript'>window.open('NouvelleApp.aspx' ,'NouvelleApp','height=559,width=721,menubar=no,resizable=no,titlebar=no,scrollbars=no, left='+((screen.width - 721) / 2)+',top='+ (screen.height - 559) / 2+'');</script>");
+           
+        }
+
+        protected void lblDetailUser_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //Changement de mot de passe
+        protected void cmdChangePwd_Click(object sender, ImageClickEventArgs e)
+        {
+            if (txtPwd1.Text != txtPwd2.Text)
+            {
+                lblCha.Visible = true;
+                lblCha.Text = " Mots de passe pas identiques !";
+            }
+            else
+            {
+                SqlConnection lnCon = new SqlConnection("Data Source=SRV-SQL;Initial Catalog=Lilou;Integrated Security=True");
+                string lsSou, code;
+                SqlCommand lcCmd = new SqlCommand();
+                SqlCommand lcCmdD = new SqlCommand();
+                SqlDataReader lnRdr;
+                SqlCommand lcCmd2 = new SqlCommand();
+                try
+                {
+                    lnCon.Open();
+                }
+                catch (Exception Error)
+                {
+                    lblErr.Text = Error.Message;
+                    code = lblErr.Text;
+                }
+                //Recuperation Source
+                lsSou = "UPDATE UTILISATEURS";
+                lsSou += " SET  UTILISATEURS.TXT_PWD = " + "'" + txtPwd2.Text + "'";
+                lsSou += " WHERE  UTILISATEURS.IDF_USR =" + "'" + Session["UsrIdf"] + "'";
+                // lsSou += " WHERE UTILISATEURS.TXT_COD =" + "'" + cboApp.SelectedItem.ToString() + "'";
+                lcCmd = new SqlCommand(lsSou, lnCon);
+                lnRdr = lcCmd.ExecuteReader();
+                lnRdr.Read();
+                //serveur = lnRdr["TXT_SOU"].ToString();
+                lnRdr.Close();
+            }
+        }
+
+        protected void txtDes_Lan_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void ImageButton1_Click1(object sender, ImageClickEventArgs e)
+        {
+
+        }
+
+        protected void cmdMod_Click(object sender, EventArgs e)
+        {
+            Response.Write("<script language='javascript'>window.open('ModifApp.aspx' ,'Modification d'application','height=559,width=721,menubar=no,resizable=no,titlebar=no,scrollbars=no, left='+((screen.width - 721) / 2)+',top='+ (screen.height - 559) / 2+'');</script>");
+        }
+    }
+}

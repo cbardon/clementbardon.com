@@ -1,0 +1,171 @@
+body
+{
+background-color: white;
+font-family: "Verdana", Calibri, serif
+}
+
+h2
+{
+text-align: center;
+}
+
+.global
+	{
+		position: relative;
+		margin-left: 0px;
+		margin-right: 0px;
+		z-index:1;
+	}
+		
+#acc
+{
+	color: white;
+	position:absolute;
+	z-index:2;
+	opacity:0.4;
+	filter:alpha(opacity=40);
+	top:100px;
+	left:150px;
+	text-align:center;
+}
+
+.jou
+{
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 1;
+	text-decoration: none;
+	color: white;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.5); /* ombre décalée de 0px à droite, 1px en haut, un flou de 0px, de couleur noir et d'opacité 50% */
+	position:absolute;
+	opacity:0.4;
+	filter:alpha(opacity=40);
+	top:82px;
+	left:500px;
+
+	
+	/* style général du bouton */
+	display: inline-block;
+	padding: 20px 78px 11px;
+	-moz-border-radius: 8px; /* coins arrondi pour Firefox */
+	-webkit-border-radius: 8px; /* coins arrondi pour Safari et Chrome */
+	border-radius: 8px;
+	margin: 2px;
+}
+
+.for
+{
+	/* style du texte */
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 1;
+	text-decoration: none;
+	color: white;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.5); /* ombre décalée de 0px à droite, 1px en haut, un flou de 0px, de couleur noir et d'opacité 50% */
+	position:absolute;
+	opacity:0.4;
+	filter:alpha(opacity=40);
+	top:82px;
+	left:774px;
+
+	
+	/* style général du bouton */
+	display: inline-block;
+	padding: 20px 78px 11px;
+	-moz-border-radius: 8px; /* coins arrondi pour Firefox */
+	-webkit-border-radius: 8px; /* coins arrondi pour Safari et Chrome */
+	border-radius: 8px;
+	margin: 2px;
+}
+
+.esp
+{
+	/* style du texte */
+	font-size: 16px;
+	font-weight: bold;
+	line-height: 1;
+	text-decoration: none;
+	color: white;
+	text-shadow: 0 -1px 0 rgba(0,0,0,0.5); /* ombre décalée de 0px à droite, 1px en haut, un flou de 0px, de couleur noir et d'opacité 50% */
+	position:absolute;
+	opacity:0.4;
+	filter:alpha(opacity=40);
+	top:82px;
+	left:965px;
+
+	
+	/* style général du bouton */
+	display: inline-block;
+	padding: 20px 78px 11px;
+	-moz-border-radius: 8px; /* coins arrondi pour Firefox */
+	-webkit-border-radius: 8px; /* coins arrondi pour Safari et Chrome */
+	border-radius: 8px;
+	margin: 2px;
+}
+
+.webchat
+{
+	position:absolute;
+	top:300px;
+	right:0px;
+	z-index:4;
+}
+
+.cal_placement
+{
+	position:absolute;
+	top:425px;
+    left:41px;
+}
+
+.cal_calendrier
+{
+        border:1px solid black;
+        padding:1px;
+        background-color:#4594ff;
+        width:250px;
+        height:200px;
+}
+.cal_calendrier th
+{
+        border:1px solid black;
+        background-color:#ffffff;
+}
+.cal_calendrier td
+{
+        border:1px solid black;
+        background-color:#ffffff;
+        text-align:center;
+}
+.cal_aujourdhui
+{
+        color:#ff0000;
+}
+.cal_jours_av_ap
+{
+        color:#5a779e;
+}
+
+#header
+{
+    text-align:center;
+	z-index:1;
+}
+
+#tv
+{
+	position:absolute;
+}
+
+#stream
+{
+ position:absolute;
+ z-index:1;
+ margin-right:100px;
+}
+
+#affichage
+{
+color: white;
+
+}

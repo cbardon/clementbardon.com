@@ -1,0 +1,412 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site1.master.cs" Inherits="WebApplication10.Site1" %>
+<html>
+  <head id="Head2" runat="server">
+ <%--   <meta http-equiv="Page-Enter" content="blendTrans(Duration=0.4)" />--%>
+         <link rel="StyleSheet" href="main.css"/> 
+      <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+ 
+    <title>PAPH</title>
+       <script type="text/javascript">
+
+           function Hide() {
+               document.getElementById("theDiv").style.display = "none";
+           }
+           function UserShow() {
+               document.getElementById("theDiv").style.top = 35;
+               document.getElementById("theDiv").style.left = 875;
+               document.getElementById("theDiv").style.display = "block";
+               document.getElementById('detailId').style.visibility = "Hidden";
+               document.getElementById('LabelTest1').style.visibility = "Hidden";
+               document.getElementById('LabelTest2').style.visibility = "Hidden";
+               document.getElementById('LabelTest3').style.visibility = "Hidden";
+           }
+           function OverListePaie() {
+               document.getElementById("cmdHisto").style.background = "White";
+               document.getElementById("cmdHisto").style.color = "Black";
+           }
+           function OutListePaie() {
+               document.getElementById("cmdHisto").style.background = "#BACFE4";
+               document.getElementById("cmdHisto").style.color = "#666666";
+           }
+
+           function OverInfDos() {
+               document.getElementById("FormDos$cmdInfDos").style.background = "White";
+               document.getElementById("FormDos$cmdInfDos").style.color = "Black";
+           }
+           function OutInfDos() {
+               document.getElementById("FormDos$cmdInfDos").style.background = "#BACFE4";
+               document.getElementById("FormDos$cmdInfDos").style.color = "#666666";
+           }
+           function OverNewDos() {
+               document.getElementById("cmdNewDos").style.background = "Black";
+               document.getElementById("cmdNewDos").style.color = "White";
+           }
+           function OutNewDos() {
+               document.getElementById("cmdNewDos").style.background = "Transparent";
+               document.getElementById("cmdNewDos").style.color = "#CCCCCC";
+           }
+           function OverPaiements() {
+               document.getElementById("cmdPaiements").style.background = "Black";
+               document.getElementById("cmdPaiements").style.color = "White";
+           }
+           function OutPaiements() {
+               document.getElementById("cmdPaiements").style.background = "Transparent";
+               document.getElementById("cmdPAiements").style.color = "#CCCCCC";
+           }
+           function timedRefresh(timeoutPeriod) {
+               setTimeout("location.reload(true);", timeoutPeriod);
+           }
+
+           function showNav() {
+               document.getElementById('nav').style.visibility = "Visible";
+           }
+
+           function hideNav() {
+               document.getElementById('nav').style.visibility = "hidden";
+           }
+
+          
+
+           function NouvelleCouleur() {
+               document.getElementById("descriptif").style.backgroundColor = "#CECECE";
+               document.getElementById("lblId").style.color = "#303030";
+           }
+
+           function AncienneCouleur() {
+               document.getElementById("descriptif").style.backgroundColor = "#303030";
+               document.getElementById("lblId").style.color = "#CECECE";
+           }
+
+
+           function NouvelleCouleurAvancée() {
+               document.getElementById("Avancee").style.backgroundColor = "#CECECE";
+             
+           }
+
+           function AncienneCouleurAvancée() {
+               document.getElementById("Avancee").style.backgroundColor = "#303030";
+      
+           }
+
+
+           function AncienneCouleur1() {
+               document.getElementById("articleAvancee").style.backgroundColor = "#303030";
+           }
+
+           function NouvelleCouleur1() {
+               document.getElementById("articleAvancee").style.backgroundColor = "#CECECE";
+           }
+
+           function DerniersDossLbl() {
+               document.getElementById('LabelDoss').style.visibility = "Visible";
+           }
+
+           function DerniersDossCroix() {
+               document.getElementById('btn').style.visibility = "Visible";
+           }
+
+           function DerniersDossListe() {
+               document.getElementById('listeBox').style.visibility = "Visible";
+               document.getElementById('imageTest').style.visibility = "Hidden";
+
+           }
+
+           function DerniersDossListeCache() {
+               document.getElementById('listeBox').style.visibility = "Hidden";
+
+               document.getElementById('imageTest').style.visibility = "Visible";
+           }
+
+           function descriptifVis() {
+               document.getElementById('detailId').style.visibility = "Visible";
+               document.getElementById('LabelTest1').style.visibility = "Visible";
+               document.getElementById('LabelTest2').style.visibility = "Visible";
+               document.getElementById('LabelTest3').style.visibility = "Visible";
+
+           }
+
+           function descriptifCache() {
+               document.getElementById('detailId').style.visibility = "Hidden";
+               document.getElementById('LabelTest1').style.visibility = "Hidden";
+               document.getElementById('LabelTest2').style.visibility = "Hidden";
+               document.getElementById('LabelTest3').style.visibility = "Hidden";
+
+           }
+
+           function ie8() {
+               src = "http://html5shiv.googlecode.com/svn/trunk/html5.js";
+           }
+
+           function menuInfo()
+           {
+              
+               document.getElementById('MAJ').style.visibility = "Hidden";
+               document.getElementById('MAJ').style.display = "none";
+               document.getElementById('ImageButton5').style.visibility = "Hidden";
+           }
+           
+           function menuInfoVis() {
+
+               document.getElementById('MAJ').style.visibility = "Visible";
+               document.getElementById('MAJ').style.display = "block";
+     
+           }
+
+           function menuMessVis()
+           {
+           
+               document.getElementById('GridViewNonLu').style.visibility = "Visible";
+               document.getElementById('GridViewNonLu').style.display = "block";
+               document.getElementById('lblLu').style.visibility = "Visible";
+           
+
+           }
+           function menuMessCache() {
+
+               document.getElementById('GridViewNonLu').style.visibility = "Hidden";
+               document.getElementById('GridViewNonLu').style.display = "none";
+               document.getElementById('lblLu').style.visibility = "Hidden";
+
+           }
+           function menuMessLu() {
+
+               document.getElementById('GridViewLu').style.visibility = "Visible";
+               document.getElementById('GridViewLu').style.display = "block";
+               document.getElementById('BtnFermer').style.visibility = "Visible";
+
+
+           }
+           function menuMessCacheLu() {
+
+               document.getElementById('GridViewLu').style.visibility = "Hidden";
+               document.getElementById('GridViewLu').style.display = "none";
+               document.getElementById('BtnFermer').style.visibility = "Hidden";
+
+           }
+
+           function RechercheAvanceeShow() {
+            
+             
+               document.getElementById("IdAvancee").style.display = "block";
+              
+               
+           }
+       </script>
+
+ <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+
+
+  
+   
+</head><body id="Bdy" class="style1"
+    onload="window.moveTo(0,0);window.resizeTo(screen.width,screen.height);">
+    
+		<form id="FORM2" runat="server" visible="True">
+        
+                    <!------------------------------------------------------------------------- DEBUT Message erreur ------------------------------------------------------------------------->
+
+           <aside style="top: 0px;display:none; left: -2px; width: 100%; background-color:#2165A7; height: 27px;" id="MAJ">
+                   <asp:Label ID="Label1" runat="server"></asp:Label> 
+                 &nbsp;&nbsp;&nbsp; 
+            
+              
+                   <asp:HyperLink ID="FermerLien" runat="server" Text="Fermer"  onClick="menuInfo()"></asp:HyperLink>
+              
+                 &nbsp;&nbsp;&nbsp;
+
+                 </aside>  
+            
+           <!------------------------------------------------------------------------- FIN Message erreur ------------------------------------------------------------------------->
+              
+				
+            <!------------------------------------------------------------------------- DEBUT HEADER ------------------------------------------------------------------------->
+        
+              
+				<header  id="container" style="height: 46px; top:0px; margin-left:auto;margin-right:auto; position:relative; left: 2px;" >
+                  
+                     <!------------------------------------------------------------------------- PAPH ------------------------------------------------------------------------->
+                    
+                            &nbsp;
+                     <!------------------------------------------------------------------------- Logo ------------------------------------------------------------------------->
+                           <asp:Image ID="Image1" runat="server" ImageUrl ="Images/logo_ok.png" style="position:absolute; top: 0px; left:0px; right: 1446px; height: 42px; width: 98px;"/>
+
+                    <!------------------------------------------------------------------------- Barre de Recherche ------------------------------------------------------------------------->
+                   <asp:TextBox  ID="TextBox1" runat="server" style="position:absolute;bottom:8px; left: auto; right: 755px; display:block;" Height="26px" Width="195px"></asp:TextBox> 
+
+                      <!------------------------------------------------------------------------- Bouton Recherche ------------------------------------------------------------------------->
+                            <asp:ImageButton ID="ImageButton1" runat="server" Height="49px" ImageUrl="Images/recherche1.png" style="position: absolute; top: -1px; left: auto; right: 682px;" Width="74px" />
+&nbsp;
+                    <!------------------------------------------------------------------------- Bouton Avancée ------------------------------------------------------------------------->
+                        
+                       <aside onmouseover="NouvelleCouleurAvancée()"; onmouseout="AncienneCouleurAvancée();RechercheAvanceeShow()" style="position: absolute; top: 5px; left: auto; right: 619px; height: 37px; width: 57px;" id="Avancee"> <asp:ImageButton ID="BtnAvancee" runat="server" Height="36px" ImageUrl="Images/avancée.png" style="position: absolute; top:0px; left: auto; right: -1px;" title="Recherche avancée" Width="55px" /></aside>
+                <aside  runat="server" id="IdAvancee" style="border-color: #d3d3d3; border-width: 1px; display:none;  left: auto; width: auto; position: absolute;
+                                  right: 619px;top: 5px; height: auto; background-color: transparent; ">
+            <!-------------------------------------------------------------------------Debut Formulaire Recherche Avancée ------------------------------------------------------------------------->
+                        
+                    <asp:Panel ID="Panel2" runat="server" BackColor="#d3d3d3" BorderColor="DimGray" 
+                BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Names="Tahoma" 
+                Font-Size="8pt" ForeColor="Black" HorizontalAlign="Left" Style="z-index: 100; left: -207px; position: absolute;
+                                        top: 42px; width: 291px; height: 97px; right:-83px;" >
+                <asp:Label ID="Label2" runat="server" BackColor="Black" BorderStyle="None" 
+                    EnableViewState="False" Font-Bold="True" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="White" Style="z-index: 100; left: 0px; position: absolute;
+                                        top: 3px; height: 13px; width: 223px;" 
+                    Text="&amp;nbsp;&amp;nbsp;Recherche avancée"></asp:Label>
+                <asp:TextBox ID="TextBox2" runat="server" BorderColor="LightSteelBlue" 
+                    BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Size="8pt" 
+                    MaxLength="10" Style="z-index: 100; left: 4px;
+                                    position: absolute; top: 41px; width: 167px;" >
+                  </asp:TextBox>
+                <asp:Label ID="Label4" runat="server" BackColor="Transparent" 
+                    BorderColor="Silver" BorderStyle="None" Font-Bold="False" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="#333333" 
+                    Style="z-index: 102; left: 4px; position: absolute; top: 64px; height: 10px;" 
+                    Text="Autre test :"></asp:Label>
+                <asp:Label ID="Label7" runat="server" BackColor="Transparent" 
+                    BorderColor="Silver" BorderStyle="None" Font-Bold="False" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="#333333" 
+                    Style="z-index: 102; left: 2px; position: absolute; top: 21px; width: 144px; height: 10px;" 
+                    Text="Test :"></asp:Label>
+              <asp:ImageButton ID="ImageButton10" runat="server" Height="49px" ImageUrl="Images/recherche1.png" style="position: absolute; top: 42px; left: 208px; right: 7px;" Width="74px" />
+            
+                <asp:TextBox ID="TextBox3" runat="server" BorderColor="LightSteelBlue" BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Size="8pt" MaxLength="10" Style="z-index: 100; left: 4px;
+                                    position: absolute; top: 79px; width: 168px;" ></asp:TextBox>
+                <asp:ImageButton   ID="ImageButton8" runat="server"   style="position:absolute; top: -1px; left: 250px; height: 28px; width: 36px;"   ImageUrl="~/Images/erreur.gif"/>
+            </asp:Panel>
+               
+                    <!-------------------------------------------------------------------------Fin Formulaire Recherche Avancée ------------------------------------------------------------------------->
+                </aside>
+                      
+                            <asp:ImageButton ID="ImageButton2" runat="server" ImageUrl="Images/ferm.png" style="position:absolute; top: 0px; left: auto; height: 41px; width: 45px; right: 0px;" OnClick="btnFerm_Click"/>
+                     
+                       <!------------------------------------------------------------------------- Icone USER ------------------------------------------------------------------------->
+                           <aside onmouseover=" NouvelleCouleur()"; onmouseout="AncienneCouleur()" style="position:absolute; top: -2px; left: auto; right:120px; width: 116px; height: 45px;" id="descriptif" > 
+                               <asp:Label  onmouseover="descriptifVis()"  ID="lblId" runat="server" Text="Label" style="position:absolute; top: auto; left: auto; right:auto; width: auto; " ForeColor="#CCCCCC"></asp:Label>
+
+                           </aside>
+
+         
+                 
+                  <!------------------------------------------------------------------------- Fenetre cacher USER ------------------------------------------------------------------------->
+                        <aside   style="position:absolute; top: 35px; left: auto; right:0px; height: 468px; width:342px;">
+                    
+                    <aside   style="position:absolute; top: 0px; left: auto; right:50px; height: auto;bottom:auto; width: auto; background-color:#808080; visibility: hidden;" id="detailId" >
+                 <br /><asp:ImageButton onMouseOut=descriptifCache(); ID="ImageButton4" runat="server" ImageUrl="Images/croix.png" style="width:55px;right:0px;left:auto;float:right;"  />
+               
+                   
+                    <asp:Label ID="LabelTest1" runat="server" Text="Label" ForeColor="#CCCCCC"></asp:Label>
+                    <br />
+                    <asp:Label ID="LabelTest2" runat="server" Text="Label" ForeColor="#CCCCCC"></asp:Label>
+                     <br />
+                    <asp:Label ID="LabelTest3" runat="server" Text="Label" ForeColor="#CCCCCC"></asp:Label>
+                  <br />       
+
+                     <asp:label OnClick="UserShow()" class="labelright"
+                                ID="lblUser" runat="server" Font-Names="Calibri" Font-Size="9pt" ForeColor="White"
+                                Style="cursor:pointer;z-index: 105;  position: absolute; top: 1px; left: auto; height: 46px; width: auto;right:auto;" 
+                                Text="Changer mot de passe" BorderStyle="None" 
+            UseSubmitBehavior="False"></asp:label> 
+                            </aside> 
+                 <!-------------------------------------------------------------------------Fin Fenetre cacher USER ------------------------------------------------------------------------->
+             </aside>
+                      <!------------------------------------------------------------------------- FIN Icone USER ------------------------------------------------------------------------->
+                 </header>
+            <!------------------------------------------------------------------------- Fin HEADER ------------------------------------------------------------------------->
+
+          <!------------------------------------------------------------------------- Fenetre Changer Mot de Passe ------------------------------------------------------------------------->
+            <article   runat="server" id="theDiv" style="border-color: #d3d3d3; border-width: 1px; display:none;  left: auto; width: auto; position: absolute;
+                                   right:0px; top: auto; height: auto; background-color: transparent; ">
+            <asp:Panel ID="Panel1" runat="server" BackColor="#E9E9E9" BorderColor="DimGray" 
+                BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Names="Tahoma" 
+                Font-Size="8pt" ForeColor="Black" HorizontalAlign="Left" Style="z-index: 100; left: auto; position: absolute;
+                                        top: 3px; width: 291px; height: 97px; right:0px;" >
+                <asp:Label ID="Label5" runat="server" BackColor="Black" BorderStyle="None" 
+                    EnableViewState="False" Font-Bold="True" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="White" Style="z-index: 100; left: 0px; position: absolute;
+                                        top: 3px; height: 13px; width: 223px;" 
+                    Text="&amp;nbsp;&amp;nbsp;Fiche utilisateur"></asp:Label>
+                <asp:TextBox ID="txtPwd1" runat="server" BorderColor="LightSteelBlue" 
+                    BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Size="8pt" 
+                    MaxLength="10" Style="z-index: 100; left: 4px;
+                                    position: absolute; top: 41px; width: 167px;" 
+                    TextMode="Password"></asp:TextBox>
+                <asp:Label ID="lblPwd2" runat="server" BackColor="Transparent" 
+                    BorderColor="Silver" BorderStyle="None" Font-Bold="False" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="#333333" 
+                    Style="z-index: 102; left: 4px; position: absolute; top: 64px; height: 10px;" 
+                    Text="Répéter :"></asp:Label>
+                <asp:Label ID="lblPwd" runat="server" BackColor="Transparent" 
+                    BorderColor="Silver" BorderStyle="None" Font-Bold="False" Font-Names="arial" 
+                    Font-Overline="False" Font-Size="8pt" Font-Strikeout="False" 
+                    Font-Underline="False" ForeColor="#333333" 
+                    Style="z-index: 102; left: 2px; position: absolute; top: 21px; width: 144px; height: 10px;" 
+                    Text="Changer de mot de passe :"></asp:Label>
+              
+                <asp:Label ID="Label6" runat="server" Text="10 caractères max"   style="position:absolute; top: 22px; left: 140px; height: 16px; width: 117px;"></asp:Label>
+              
+                <asp:ImageButton ID="cmdChangePwd" runat="server" 
+                    ImageUrl="~/Images/Cadenas.jpg" 
+                    style="position:absolute; top: 63px; left: 249px; height: 28px; width: 32px;" OnClick="cmdChangePwd_Click" />
+                <asp:Label ID="lblCha" runat="server"  style="position:absolute; top: 63px; left: 61px; height: 13px; width: 185px;" Font-Size="Smaller" Visible="False"></asp:Label>
+                <asp:TextBox ID="txtPwd2" runat="server" BorderColor="LightSteelBlue" BorderStyle="Solid" BorderWidth="1px" Font-Bold="True" Font-Size="8pt" MaxLength="10" Style="z-index: 100; left: 4px;
+                                    position: absolute; top: 79px; width: 168px;" TextMode="Password"></asp:TextBox>
+                <asp:ImageButton   ID="ImageButton3" runat="server"   style="position:absolute; top: -1px; left: 250px; height: 28px; width: 36px;"   ImageUrl="~/Images/erreur.gif"/>
+            </asp:Panel>
+               
+
+
+        </article>
+             <!-------------------------------------------------------------------------Fin Fenetre Changer Mot de Passe ------------------------------------------------------------------------->
+
+            <!------------------------------------------------------------------------- Menu nav ------------------------------------------------------------------------->
+             <aside onfocus="showNav()" onblur="hideNav()" onmouseover="showNav()" onmouseout="hideNav()" style="height: 39px; right:0px;left:0px;">
+           <nav id="nav" style="height: 43px; top: -4px; margin-left:auto;margin-right:auto;  position:relative; background-color: black; margin-bottom: 0px; left: 1px;visibility: hidden; ">
+       
+              
+ <ul id="menu">
+    <li id='accueil'><a href="http://localhost:54751/WebForm1.aspx">ACCUEIL</a></li>
+   <li><a href="http://localhost:54751/WebForm2.aspx" class='WebForm2.aspx'>CATALOGUE</a></li>
+    <li><a href="fonction" class='fonction'>FONCTIONNEMENT</a></li>
+    <li><a class='service' href="service">LES SERVICES</a></li>
+    <li><a class='commande' href="commande">COMMANDE</a></li>
+   
+    </ul>
+                          </nav>
+            </aside>
+            <!------------------------------------------------------------------------- Fin Menu nav ------------------------------------------------------------------------->
+
+            <!------------------------------------------------------------------------- Fenetre cacher Dernier Dossier ------------------------------------------------------------------------->
+             <aside  style="position:fixed; top: 82px; left: auto; bottom:91px; right:0px; height: 234px; width: 342px;">
+                              <asp:ImageButton  ID="imageTest" runat="server"  onMouseover=DerniersDossListe()  ImageUrl ="Images/liste.png" style="position:fixed; top: 74px; right:0px; height: 31px; width: 47px;" OnClick="ImageButton2_Click2" />
+                            
+                            <asp:ListBox ID="listeBox" runat="server" onMouseOut=DerniersDossListeCache(); style="position:fixed; top: 84px; left: auto; right:0px; visibility: hidden;  bottom:137px; height: 186px; width: 296px; margin-top: 0px; margin-bottom: 0px;"></asp:ListBox>
+                           
+                                       </aside>         
+            <!-------------------------------------------------------------------------Fin Fenetre cacher Dernier Dossier ------------------------------------------------------------------------->
+
+
+            <!------------------------------------------------------------------------- CORPS de la page ------------------------------------------------------------------------->
+        <asp:ContentPlaceHolder ID="Corps" runat="server">
+      
+        </asp:ContentPlaceHolder>
+             <!------------------------------------------------------------------------- FIN CORPS de la page ------------------------------------------------------------------------->
+
+             <!------------------------------------------------------------------------- DEBUT FOOTER ------------------------------------------------------------------------->
+            <footer>
+
+    <asp:Image ID="Image5" runat="server" ImageUrl="Images/ecrire.png" style="position:fixed; bottom:0px; left: auto; height: 60px; width: 87px; right:0px; bottom:0px;" />
+                 <a href="#Bdy" style="bottom:auto;left:auto;right:auto;">Haut de page</a>
+                         </footer>
+
+                   <!-------------------------------------------------------------------------FIN FOOTER ------------------------------------------------------------------------->
+    </form>  
+      
+
+      
+    </body> 
+</html>

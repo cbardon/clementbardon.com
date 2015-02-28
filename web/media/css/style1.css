@@ -1,0 +1,11 @@
+#wcont1b .panel 
+{ 
+	max-height: 150px; 
+	overflow-y: scroll; 
+}
+#wcont2b .panel 
+{ 
+	max-height: 150px; 
+	overflow-y: scroll; 
+}
+

@@ -1,0 +1,29 @@
+ Gravez l'image ISO sur un DVD. Un boot sur clé USB ou par réseau est également possible pour les plus expérimentés.
+
+- Choisissez dans le BIOS le démarrage sur le DVD ou un autre support.
+
+- Appuyez sur une touche pour démarrer sur le DVD ou un autre support ( si demandé ).
+
+- Suivez les instructions à l'écran.
+
+- Telechargez et utilisez "Daz Windows Loader" pour cracker. (Last Version 2.1.7)
+Sur le site "officiel" : http://forums.mydigitallife.info/threads/24901-Windows-Loader-Current-release-information
+Sur T411 : http://www.t411.me/torrents/windows-loader-v2-1-7-by-daz-anglais
+
+- Grace au crack, l'activation est definitive et les mises à jour via "windows update" et "microsoft update" sont accecibles.
+
+- Enjoy
+
+Pour les connaisseur, ei.cfg à été supprimer. Vous pouvez le restaurer pour retrouver l'ISO original à l'aide de "ei.cfg Removal Utility". Vous pouvez le telecharger :
+Sur le site "officiel" : http://code.kliu.org/misc/winisoutils/
+Sur T411 : http://www.t411.me/torrents/creer-un-dvd-windows-7-universel-contenant-toutes-les-editions
+
+*********************************************
+
+Pour ceux que ca peut aider, si vous lancez le loader et que vous avez marqué dans status "Notification", et que le loader ne fonctionne pas (même en mode admin)
+
+voila la démarche qui à fonctionné pour moi :
+-lancer un invite de commande en mode admin
+-tapez la commande suivante SANS LES GUILLEMETS "slmgr -rearm"
+-un message doit normalement vous avertir que la commande a été exécuté et qu'il faut redémarrer le pc, faite le.
+-une fois redémarrer, lancer le loader, installer le et redémarrer encore.
